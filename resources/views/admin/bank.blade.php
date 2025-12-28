@@ -30,34 +30,34 @@
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             <div
-                class="rounded-[26px] border border-emerald-200/70 bg-emerald-50/70 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                class="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4 dark:border-emerald-500/20 dark:bg-emerald-500/10">
                 <p class="text-xs uppercase tracking-[0.3em] text-emerald-600">Доходы</p>
                 <p class="mt-3 text-2xl font-semibold text-emerald-700 dark:text-emerald-200">
                     {{ number_format($stats['income'], 2, '.', ' ') }} с
                 </p>
             </div>
             <div
-                class="rounded-[26px] border border-rose-200/70 bg-rose-50/70 p-4 dark:border-rose-500/20 dark:bg-rose-500/10">
+                class="rounded-2xl border border-rose-200/70 bg-rose-50/70 p-4 dark:border-rose-500/20 dark:bg-rose-500/10">
                 <p class="text-xs uppercase tracking-[0.3em] text-rose-600">Расходы</p>
                 <p class="mt-3 text-2xl font-semibold text-rose-700 dark:text-rose-200">
                     {{ number_format($stats['expenses'], 2, '.', ' ') }} с
                 </p>
             </div>
             <div
-                class="rounded-[26px] border border-amber-200/70 bg-amber-50/70 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
+                class="rounded-2xl border border-amber-200/70 bg-amber-50/70 p-4 dark:border-amber-500/20 dark:bg-amber-500/10">
                 <p class="text-xs uppercase tracking-[0.3em] text-amber-600">Долги</p>
                 <p class="mt-3 text-2xl font-semibold text-amber-700 dark:text-amber-200">
                     {{ number_format($stats['openDebts'], 2, '.', ' ') }} с
                 </p>
             </div>
             <div
-                class="rounded-[26px] border border-indigo-200/70 bg-indigo-50/70 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                class="rounded-2xl border border-indigo-200/70 bg-indigo-50/70 p-4 dark:border-indigo-500/20 dark:bg-indigo-500/10">
                 <p class="text-xs uppercase tracking-[0.3em] text-indigo-600">Оплачено долгов</p>
                 <p class="mt-3 text-2xl font-semibold text-indigo-700 dark:text-indigo-200">
                     {{ number_format($stats['paidDebts'], 2, '.', ' ') }} с
                 </p>
             </div>
-            <div class="rounded-[26px] border border-slate-200/70 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <div class="rounded-2xl border border-slate-200/70 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
                 <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Баланс</p>
                 <p class="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">
                     {{ number_format($stats['balance'], 2, '.', ' ') }} с
@@ -193,7 +193,7 @@
     <div class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur"
         data-modal="bank-create">
         <div
-            class="w-full max-w-xl rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-slate-950">
+            class="w-full max-w-xl rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-slate-950">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Новая операция</p>
@@ -229,7 +229,7 @@
     <div class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur"
         data-modal="bank-edit">
         <div
-            class="w-full max-w-xl rounded-[28px] border border-slate-200/70 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-slate-950">
+            class="w-full max-w-xl rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-slate-950">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Редактирование</p>
