@@ -50,13 +50,14 @@
                     <div class="px-4 py-4 md:px-6">
                         <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:w-full">
                             <div class="flex items-center justify-between gap-3 lg:w-full">
-                                <div class="flex items-center gap-3">
+                                <div class="hidden lg:flex items-center gap-3">
                                     <span
                                         class="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-500 ring-1 ring-indigo-400/20 dark:bg-indigo-500/20 dark:text-indigo-200 dark:ring-indigo-400/30">
                                         <x-icon type="outline" icon="ruler-2" size="20"></x-icon>
                                     </span>
                                     <div class="leading-tight">
-                                        <span class="text-base font-semibold text-slate-900 dark:text-white">Панель замера</span>
+                                        <span class="text-base font-semibold text-slate-900 dark:text-white">Панель
+                                            замера</span>
                                         <span class="block text-xs text-slate-500 dark:text-slate-400">Soyabon</span>
                                     </div>
                                 </div>
@@ -95,8 +96,7 @@
                                                 </span>
                                                 <span
                                                     class="hidden text-slate-400 transition group-hover:text-slate-600 md:inline-flex dark:text-slate-500 dark:group-hover:text-slate-300">
-                                                    <x-icon type="outline" icon="chevron-down"
-                                                        size="4"></x-icon>
+                                                    <x-icon type="outline" icon="chevron-down" size="4"></x-icon>
                                                 </span>
                                             </span>
                                         </button>
