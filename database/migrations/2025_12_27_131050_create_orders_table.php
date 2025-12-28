@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('client_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedBigInteger('client_id')->nullable();
             $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
             $table->text('comment')->nullable();
             $table->string('motor')->nullable();
