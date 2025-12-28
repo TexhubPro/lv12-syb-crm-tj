@@ -1,4 +1,5 @@
-<div class="mt-10">
+<div class="mt-10 max-h-[calc(100vh-200px)] overflow-y-scroll overflow-hidden">
+
     <p class="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-500">Панель менеджера</p>
     <nav class="mt-4 grid gap-2">
         <a href="{{ route('manager.dashboard') }}"
