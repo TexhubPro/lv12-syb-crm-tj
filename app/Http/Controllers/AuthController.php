@@ -19,7 +19,7 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']])) {
+        if (Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']], true)) {
             $request->session()->regenerate();
             $user = $request->user();
             $redirect = $user?->role === 'manager'
