@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('sub_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('order_type_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('cornice_type_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('order_type_id')->nullable();
+            $table->unsignedBigInteger('cornice_type_id')->nullable();
             $table->string('order_kind')->nullable();
             $table->string('division')->nullable();
-            $table->foreignId('fabric_code_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('profile_color_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('control_type_id')->nullable()->constrained()->nullOnDelete();
+            $table->unsignedBigInteger('fabric_code_id')->nullable();
+            $table->unsignedBigInteger('profile_color_id')->nullable();
+            $table->unsignedBigInteger('control_type_id')->nullable();
             $table->decimal('width', 10, 2)->default(0);
             $table->decimal('height', 10, 2)->default(0);
             $table->unsignedInteger('quantity')->default(0);
