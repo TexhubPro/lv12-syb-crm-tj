@@ -158,7 +158,7 @@ class OrderController extends Controller
     {
         $order->delete();
 
-        return back()->with('status', 'Заказ удален.');
+        return redirect()->route('admin.orders.index')->with('status', 'Заказ удален.');
     }
 
     public function downloadReceipt(Order $order)
