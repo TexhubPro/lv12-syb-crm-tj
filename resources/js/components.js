@@ -837,3 +837,28 @@ if (!window.__texhubEnterFocusNext) {
         next.focus();
     });
 }
+
+if (!window.__texhubPreventDoubleSubmit) {
+    window.__texhubPreventDoubleSubmit = true;
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        if (!form.matches('[data-prevent-double]')) return;
+        if (form.dataset.submitted === 'true') {
+            event.preventDefault();
+            return;
+        }
+        form.dataset.submitted = 'true';
+
+        const buttons = Array.from(form.querySelectorAll('button[type="submit"], input[type="submit"]'));
+        buttons.forEach((button) => {
+            button.disabled = true;
+            if (button instanceof HTMLButtonElement && button.dataset.loadingText) {
+                button.dataset.originalText = button.textContent ?? '';
+                button.textContent = button.dataset.loadingText;
+            }
+            button.classList.add('opacity-70', 'cursor-not-allowed');
+        });
+    });
+}

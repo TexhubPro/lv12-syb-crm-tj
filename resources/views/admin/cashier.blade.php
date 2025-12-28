@@ -25,7 +25,7 @@
             </x-alert>
         @endif
 
-        <form class="grid gap-3" method="POST" action="{{ route('admin.cashier.store') }}">
+        <form class="grid gap-3" method="POST" action="{{ route('admin.cashier.store') }}" data-prevent-double>
             @csrf
 
             <div
@@ -219,7 +219,9 @@
             </div>
             <div class="flex flex-wrap items-center justify-end gap-3">
                 <x-button variant="ghost" color="default" type="reset">Сбросить</x-button>
-                <x-button type="submit" variant="solid" color="primary" size="lg">Сохранить заказ</x-button>
+                <x-button type="submit" variant="solid" color="primary" size="lg" data-loading-text="Сохраняем...">
+                    Сохранить заказ
+                </x-button>
             </div>
         </form>
     </div>

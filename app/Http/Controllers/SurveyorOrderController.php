@@ -165,11 +165,7 @@ class SurveyorOrderController extends Controller
 
     public function destroy(Request $request, Order $order)
     {
-        $this->ensureOwner($request, $order);
-
-        $order->delete();
-
-        return back()->with('status', 'Заказ удален.');
+        abort(403);
     }
 
     public function downloadReceipt(Request $request, Order $order)

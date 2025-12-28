@@ -29,16 +29,9 @@
                     <x-button variant="faded" color="success" href="{{ route('surveyor.orders.edit', $order) }}">
                         Редактировать заказ
                     </x-button>
-                    <form method="POST" action="{{ route('surveyor.orders.destroy', $order) }}">
-                        @csrf
-                        @method('DELETE')
-                        <x-button type="submit" variant="" color="danger">
-                            Удалить заказ
-                        </x-button>
-                        <x-button variant="faded" color="info" href="{{ route('surveyor.orders.index') }}">
-                            Вернуться к списку
-                        </x-button>
-                    </form>
+                    <x-button variant="faded" color="info" href="{{ route('surveyor.orders.index') }}">
+                        Вернуться к списку
+                    </x-button>
                 </div>
             </div>
 

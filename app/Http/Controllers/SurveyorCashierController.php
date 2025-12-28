@@ -120,6 +120,6 @@ class SurveyorCashierController extends Controller
             ]);
         }
 
-        return back()->with('status', 'Заказ создан.');
+        return redirect()->route('surveyor.orders.show', $order)->with('status', 'Заказ создан.');
     }
 }

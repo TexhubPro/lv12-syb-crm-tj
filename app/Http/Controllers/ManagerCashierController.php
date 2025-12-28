@@ -120,6 +120,6 @@ class ManagerCashierController extends Controller
             ]);
         }
 
-        return back()->with('status', 'Заказ создан.');
+        return redirect()->route('manager.orders.show', $order)->with('status', 'Заказ создан.');
     }
 }
