@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ManagerMiddleware
+class SurveyorMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
@@ -16,10 +16,10 @@ class ManagerMiddleware
         }
 
         if ($request->is('/')) {
-            return redirect()->route('manager.dashboard');
+            return redirect()->route('surveyor.cashier');
         }
 
-        if ($user->role !== 'manager') {
+        if ($user->role !== 'surveyor') {
             abort(403);
         }
 

@@ -22,9 +22,11 @@ class AuthController extends Controller
         if (Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']], true)) {
             $request->session()->regenerate();
             $user = $request->user();
-            $redirect = $user?->role === 'manager'
-                ? route('manager.dashboard')
-                : route('admin.dashboard');
+            $redirect = match ($user?->role) {
+                'manager' => route('manager.dashboard'),
+                'surveyor' => route('surveyor.cashier'),
+                default => route('admin.dashboard'),
+            };
 
             return redirect()->intended($redirect);
         }

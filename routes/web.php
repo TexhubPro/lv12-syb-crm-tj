@@ -16,6 +16,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\ProfileColorController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SurveyorCashierController;
+use App\Http\Controllers\SurveyorOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -93,6 +95,19 @@ Route::prefix('manager')->middleware(['auth', 'manager'])->group(function () {
     Route::get('/orders/{order}/receipt', [ManagerOrderController::class, 'downloadReceipt'])->name('manager.orders.receipt');
     Route::get('/orders/{order}/excel', [ManagerOrderController::class, 'downloadExcel'])->name('manager.orders.excel');
     Route::delete('/orders/{order}', [ManagerOrderController::class, 'destroy'])->name('manager.orders.destroy');
+});
+
+Route::prefix('surveyor')->middleware(['auth', 'surveyor'])->group(function () {
+    Route::get('/cashier', [SurveyorCashierController::class, 'create'])->name('surveyor.cashier');
+    Route::post('/cashier', [SurveyorCashierController::class, 'store'])->name('surveyor.cashier.store');
+
+    Route::get('/orders', [SurveyorOrderController::class, 'index'])->name('surveyor.orders.index');
+    Route::get('/orders/{order}', [SurveyorOrderController::class, 'show'])->name('surveyor.orders.show');
+    Route::get('/orders/{order}/edit', [SurveyorOrderController::class, 'edit'])->name('surveyor.orders.edit');
+    Route::put('/orders/{order}', [SurveyorOrderController::class, 'update'])->name('surveyor.orders.update');
+    Route::get('/orders/{order}/receipt', [SurveyorOrderController::class, 'downloadReceipt'])->name('surveyor.orders.receipt');
+    Route::get('/orders/{order}/excel', [SurveyorOrderController::class, 'downloadExcel'])->name('surveyor.orders.excel');
+    Route::delete('/orders/{order}', [SurveyorOrderController::class, 'destroy'])->name('surveyor.orders.destroy');
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])

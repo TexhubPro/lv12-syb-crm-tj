@@ -19,7 +19,14 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if ($request->user()->role !== 'admin') {
+        $role = $request->user()->role;
+        if ($role !== 'admin') {
+            if ($role === 'manager') {
+                return redirect()->route('manager.dashboard');
+            }
+            if ($role === 'surveyor') {
+                return redirect()->route('surveyor.cashier');
+            }
             abort(403);
         }
 
