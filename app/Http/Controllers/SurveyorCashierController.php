@@ -32,7 +32,7 @@ class SurveyorCashierController extends Controller
         $validated = $request->validate([
             'client_id' => ['nullable', 'exists:clients,id', 'required_without:new_client_full_name,new_client_phone'],
             'new_client_full_name' => ['nullable', 'string', 'max:255', 'required_with:new_client_phone'],
-            'new_client_phone' => ['nullable', 'string', 'max:50', 'required_with:new_client_full_name', Rule::unique('clients', 'phone')],
+            'new_client_phone' => ['nullable', 'string', 'max:50', 'required_with:new_client_full_name'],
             'new_client_phone_secondary' => ['nullable', 'string', 'max:50'],
             'new_client_address' => ['nullable', 'string', 'max:255'],
             'new_client_comment' => ['nullable', 'string', 'max:2000'],
@@ -66,13 +66,15 @@ class SurveyorCashierController extends Controller
 
         $clientId = $validated['client_id'] ?? null;
         if (!empty($validated['new_client_full_name']) || !empty($validated['new_client_phone'])) {
-            $client = Client::create([
-                'full_name' => $validated['new_client_full_name'],
-                'phone' => $validated['new_client_phone'],
-                'phone_secondary' => $validated['new_client_phone_secondary'] ?? null,
-                'address' => $validated['new_client_address'] ?? null,
-                'comment' => $validated['new_client_comment'] ?? null,
-            ]);
+            $client = Client::updateOrCreate(
+                ['phone' => $validated['new_client_phone']],
+                [
+                    'full_name' => $validated['new_client_full_name'],
+                    'phone_secondary' => $validated['new_client_phone_secondary'] ?? null,
+                    'address' => $validated['new_client_address'] ?? null,
+                    'comment' => $validated['new_client_comment'] ?? null,
+                ],
+            );
             $clientId = $client->id;
         }
 
