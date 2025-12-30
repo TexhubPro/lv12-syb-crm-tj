@@ -2,12 +2,19 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
+        DB::table('sub_orders')
+            ->whereNotIn('order_id', function ($query) {
+                $query->select('id')->from('orders');
+            })
+            ->delete();
+
         Schema::table('sub_orders', function (Blueprint $table) {
             $table->foreign('order_id')->references('id')->on('orders')->cascadeOnDelete();
             $table->foreign('order_type_id')->references('id')->on('order_types')->nullOnDelete();
