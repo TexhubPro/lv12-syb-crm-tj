@@ -31,20 +31,30 @@
         <div
             class="overflow-hidden rounded-2xl border border-slate-200/70 bg-white/70 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
             <div
-                class="grid grid-cols-[1fr_auto] gap-4 border-b border-slate-200/70 px-6 py-4 text-xs uppercase tracking-[0.3em] text-slate-500 dark:border-white/10">
+                class="grid grid-cols-[1.5fr_1fr_1fr_auto] gap-4 border-b border-slate-200/70 px-6 py-4 text-xs uppercase tracking-[0.3em] text-slate-500 dark:border-white/10">
                 <span>Название</span>
+                <span>Категория</span>
+                <span class="text-right">Цена</span>
                 <span class="text-right">Действия</span>
             </div>
             <div class="divide-y divide-slate-200/70 dark:divide-white/10">
                 @forelse ($orderTypes as $orderType)
-                    <div class="grid grid-cols-[1fr_auto] items-center gap-4 px-6 py-4">
+                    <div class="grid grid-cols-[1.5fr_1fr_1fr_auto] items-center gap-4 px-6 py-4">
                         <div>
                             <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ $orderType->name }}</p>
+                        </div>
+                        <div class="text-sm text-slate-700 dark:text-slate-200">
+                            {{ $categories[$orderType->category] ?? $orderType->category ?? '—' }}
+                        </div>
+                        <div class="text-sm font-semibold text-right text-slate-900 dark:text-white">
+                            {{ $orderType->price !== null ? number_format($orderType->price, 2, '.', ' ') . ' с' : '—' }}
                         </div>
                         <div class="flex items-center gap-2">
                             <x-button size="sm" variant="faded" color="default" icon-only="true"
                                 aria-label="Редактировать" data-modal-open="order-type-edit"
                                 data-modal-name="{{ $orderType->name }}"
+                                data-modal-category="{{ $orderType->category }}"
+                                data-modal-price="{{ $orderType->price }}"
                                 data-modal-action="{{ route('admin.order-types.update', $orderType) }}">
                                 <x-icon type="outline" icon="pencil" size="5"></x-icon>
                             </x-button>
@@ -83,6 +93,13 @@
             <form class="mt-6 grid gap-4" method="POST" action="{{ route('admin.order-types.store') }}">
                 @csrf
                 <x-input label="Название" name="name" required="true" placeholder="Например: Рулонные" />
+                <x-select label="Категория" name="category" required="true" placeholder="Выберите категорию">
+                    @foreach ($categories as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </x-select>
+                <x-input label="Цена" name="price" type="number" min="0" step="0.01" required="true"
+                    placeholder="Например: 1200" />
                 <div class="flex items-center justify-end gap-2">
                     <x-button variant="ghost" color="default" data-modal-close>Отмена</x-button>
                     <x-button type="submit" variant="solid" color="primary">Сохранить</x-button>
@@ -108,6 +125,13 @@
                 @csrf
                 @method('PUT')
                 <x-input label="Название" name="name" required="true" data-modal-input="name" />
+                <x-select label="Категория" name="category" required="true" data-modal-input="category">
+                    @foreach ($categories as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </x-select>
+                <x-input label="Цена" name="price" type="number" min="0" step="0.01" required="true"
+                    data-modal-input="price" />
                 <div class="flex items-center justify-end gap-2">
                     <x-button variant="ghost" color="default" data-modal-close>Отмена</x-button>
                     <x-button type="submit" variant="solid" color="primary">Сохранить</x-button>

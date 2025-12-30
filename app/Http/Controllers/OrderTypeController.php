@@ -12,6 +12,7 @@ class OrderTypeController extends Controller
     {
         return view('admin.order-types', [
             'orderTypes' => OrderType::orderBy('name')->get(),
+            'categories' => OrderType::CATEGORY_OPTIONS,
         ]);
     }
 
@@ -19,6 +20,8 @@ class OrderTypeController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:order_types,name'],
+            'category' => ['required', Rule::in(array_keys(OrderType::CATEGORY_OPTIONS))],
+            'price' => ['required', 'numeric', 'min:0'],
         ]);
 
         OrderType::create($validated);
@@ -30,6 +33,8 @@ class OrderTypeController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('order_types', 'name')->ignore($orderType->id)],
+            'category' => ['required', Rule::in(array_keys(OrderType::CATEGORY_OPTIONS))],
+            'price' => ['required', 'numeric', 'min:0'],
         ]);
 
         $orderType->update($validated);

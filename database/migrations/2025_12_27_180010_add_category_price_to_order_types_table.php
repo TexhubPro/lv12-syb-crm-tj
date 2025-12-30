@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('order_types', function (Blueprint $table) {
+            $table->enum('category', ['шторы', 'жалюзи', 'плиссе'])->default('шторы')->after('name');
+            $table->decimal('price', 10, 2)->default(0)->after('category');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('order_types', function (Blueprint $table) {
+            $table->dropColumn(['category', 'price']);
+        });
+    }
+};

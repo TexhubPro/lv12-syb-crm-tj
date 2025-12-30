@@ -11,6 +11,18 @@ class OrderType extends Model
 
     protected $fillable = [
         'name',
+        'category',
+        'price',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
+    public const CATEGORY_OPTIONS = [
+        'шторы' => 'Шторы',
+        'жалюзи' => 'Жалюзи',
+        'плиссе' => 'Плиссе',
     ];
 
     public function orders()
