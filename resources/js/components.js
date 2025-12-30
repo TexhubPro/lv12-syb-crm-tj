@@ -652,6 +652,61 @@ if (!window.__texhubSubOrders) {
         return Number.isFinite(num) ? num : 0;
     };
 
+    const getCalcMode = (row) => row.closest('[data-suborders]')?.dataset.subordersCalc;
+
+    const normalizeKind = (value) => {
+        const normalized = String(value ?? '').trim().toLowerCase();
+        if (!normalized) return '';
+        if (normalized.startsWith('штор')) return 'шторы';
+        if (normalized.startsWith('жалюзи')) return 'жалюзи';
+        if (normalized.startsWith('плиссе')) return 'плиссе';
+        return normalized;
+    };
+
+    const filterOrderTypes = (row) => {
+        const kindSelect = row.querySelector('[data-sub-kind]');
+        const typeSelect = row.querySelector('[data-sub-type]');
+        if (!kindSelect || !typeSelect) return;
+
+        const category = normalizeKind(kindSelect.value);
+        Array.from(typeSelect.options).forEach((option) => {
+            if (!option.value) {
+                option.hidden = false;
+                option.disabled = false;
+                return;
+            }
+            const matches = !category || option.dataset.category === category;
+            option.hidden = !matches;
+            option.disabled = !matches;
+        });
+
+        if (typeSelect.selectedOptions.length && typeSelect.selectedOptions[0]?.disabled) {
+            typeSelect.value = '';
+        }
+    };
+
+    const syncTypePrice = (row) => {
+        const typeSelect = row.querySelector('[data-sub-type]');
+        const priceInput = row.querySelector('[data-sub-price]');
+        if (!typeSelect || !priceInput) return;
+
+        const option = typeSelect.selectedOptions?.[0];
+        if (!option || !option.value) {
+            priceInput.value = '';
+            return;
+        }
+
+        if (option.dataset.price !== undefined) {
+            priceInput.value = option.dataset.price;
+        }
+    };
+
+    const ensureQtyDefault = (row) => {
+        const qtyInput = row.querySelector('[data-sub-qty]');
+        if (!qtyInput) return;
+        if (!qtyInput.value) qtyInput.value = '1';
+    };
+
     const recalcRow = (row) => {
         const width = toNumber(row.querySelector('[data-sub-width]')?.value);
         const height = toNumber(row.querySelector('[data-sub-height]')?.value);
@@ -667,7 +722,8 @@ if (!window.__texhubSubOrders) {
         if (areaInput && !manualArea) areaInput.value = area ? area.toFixed(2) : '';
 
         const price = toNumber(priceInput?.value);
-        const amount = price * qty;
+        const calcMode = getCalcMode(row);
+        const amount = calcMode === 'width-price' ? width * price * qty : price * qty;
         if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
         const discount = toNumber(discountInput?.value);
         const total = amount - discount;
@@ -722,6 +778,14 @@ if (!window.__texhubSubOrders) {
         }
     };
 
+    const initRow = (row) => {
+        if (!row) return;
+        ensureQtyDefault(row);
+        filterOrderTypes(row);
+        syncTypePrice(row);
+        recalcRow(row);
+    };
+
     const addRow = (container) => {
         const list = container.querySelector('[data-suborders-list]');
         const template = container.querySelector('[data-suborder-template]');
@@ -733,6 +797,7 @@ if (!window.__texhubSubOrders) {
         wrapper.innerHTML = html.trim();
         const row = wrapper.firstElementChild;
         if (row) list.appendChild(row);
+        initRow(row);
         const root = container.closest('form');
         recalcSummary(root);
     };
@@ -755,6 +820,24 @@ if (!window.__texhubSubOrders) {
                 recalcSummary(root);
             }
         }
+    });
+
+    document.addEventListener('change', (event) => {
+        const row = event.target.closest('[data-suborder-row]');
+        const root = event.target.closest('form');
+        if (!row) return;
+
+        if (event.target.closest('[data-sub-kind]')) {
+            filterOrderTypes(row);
+            syncTypePrice(row);
+        }
+
+        if (event.target.closest('[data-sub-type]')) {
+            syncTypePrice(row);
+        }
+
+        recalcRow(row);
+        recalcSummary(root);
     });
 
     document.addEventListener('input', (event) => {
@@ -798,6 +881,18 @@ if (!window.__texhubSubOrders) {
         );
     } else {
         document.querySelectorAll('[data-suborders]').forEach((container) => ensureInitialRow(container));
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                document.querySelectorAll('[data-suborder-row]').forEach((row) => initRow(row));
+            },
+            { once: true },
+        );
+    } else {
+        document.querySelectorAll('[data-suborder-row]').forEach((row) => initRow(row));
     }
 }
 

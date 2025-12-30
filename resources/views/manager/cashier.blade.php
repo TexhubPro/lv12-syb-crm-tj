@@ -61,7 +61,7 @@
             </div>
 
             <div class="rounded-2xl border border-slate-200/70 bg-white p-3 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5 dark:shadow-none"
-                data-suborders>
+                data-suborders data-suborders-calc="width-price">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Позиции</p>
@@ -86,14 +86,16 @@
                         </div>
                         <div class="mt-2 grid gap-3 lg:grid-cols-8">
                             <x-select label="Тип" name="sub_orders[__index__][order_kind]" placeholder="Выберите тип"
-                                required="true">
+                                required="true" data-sub-kind>
                                 @foreach (['Штора', 'Жалюзи', 'Плиссе'] as $kind)
                                     <option value="{{ $kind }}">{{ $kind }}</option>
                                 @endforeach
                             </x-select>
-                            <x-select label="Вид" name="sub_orders[__index__][order_type_id]" placeholder="Выберите вид">
+                            <x-select label="Вид" name="sub_orders[__index__][order_type_id]" placeholder="Выберите вид"
+                                data-sub-type>
                                 @foreach ($orderTypes as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    <option value="{{ $type->id }}" data-category="{{ $type->category }}"
+                                        data-price="{{ $type->price }}">{{ $type->name }}</option>
                                 @endforeach
                             </x-select>
                             <x-select label="Тип карниза" name="sub_orders[__index__][cornice_type_id]"
@@ -129,7 +131,8 @@
                             <x-input label="Разделения" name="sub_orders[__index__][division]" placeholder="Например 2" />
                             <x-input label="Ширина" name="sub_orders[__index__][width]" placeholder="см" data-sub-width />
                             <x-input label="Высота" name="sub_orders[__index__][height]" placeholder="см" data-sub-height />
-                            <x-input label="Кол-во" name="sub_orders[__index__][quantity]" placeholder="1" data-sub-qty />
+                            <x-input label="Кол-во" name="sub_orders[__index__][quantity]" value="1" placeholder="1"
+                                data-sub-qty />
                             <x-input label="Площадь" name="sub_orders[__index__][area]" placeholder="0"
                                 inputmode="decimal" step="0.01" data-sub-area />
                             <x-input label="Цена" name="sub_orders[__index__][price]" placeholder="0" data-sub-price />
