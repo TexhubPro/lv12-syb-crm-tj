@@ -723,7 +723,7 @@ if (!window.__texhubSubOrders) {
 
         const price = toNumber(priceInput?.value);
         const calcMode = getCalcMode(row);
-        const amount = calcMode === 'width-price' ? width * price * qty : price * qty;
+        const amount = calcMode === 'width-price' ? (width / 100) * price * qty : price * qty;
         if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
         const discount = toNumber(discountInput?.value);
         const total = amount - discount;
