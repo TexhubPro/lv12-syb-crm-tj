@@ -23,6 +23,9 @@
             <x-alert variant="danger" title="Ошибка">
                 Проверьте форму и попробуйте снова.
             </x-alert>
+            <script type="application/json" data-form-errors>
+                @json($errors->getMessages())
+            </script>
         @endif
 
         <form class="grid gap-3" method="POST" action="{{ route('admin.cashier.store') }}" data-prevent-double>
@@ -62,6 +65,9 @@
 
             <div class="rounded-2xl border border-slate-200/70 bg-white p-3 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5 dark:shadow-none"
                 data-suborders data-suborders-calc="width-price">
+                <script type="application/json" data-suborders-initial>
+                    @json(old('sub_orders', []))
+                </script>
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Позиции</p>

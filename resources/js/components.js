@@ -670,6 +670,36 @@ if (!window.__texhubSubOrders) {
         return Array.from(list.options).find((option) => String(option.value).trim().toLowerCase() === normalized);
     };
 
+    const findTypeOptionById = (list, id) => {
+        if (!list) return null;
+        const idValue = String(id ?? '').trim();
+        if (!idValue) return null;
+        return Array.from(list.options).find((option) => String(option.dataset.id ?? '') === idValue);
+    };
+
+    const keyToName = (key) => {
+        if (!key.includes('.')) return key;
+        const parts = key.split('.');
+        return parts[0] + parts.slice(1).map((part) => `[${part}]`).join('');
+    };
+
+    const applyFieldError = (field, message) => {
+        if (!field || !message) return;
+        const root = field.closest('[data-input-root]');
+        const container = root || field.parentElement;
+        if (!container) return;
+
+        field.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-700');
+        let error = container.querySelector('[data-field-error]');
+        if (!error) {
+            error = document.createElement('p');
+            error.dataset.fieldError = 'true';
+            error.className = 'text-rose-600 dark:text-rose-400 text-xs';
+            container.appendChild(error);
+        }
+        error.textContent = message;
+    };
+
     const filterOrderTypes = (row) => {
         const kindSelect = row.querySelector('[data-sub-kind]');
         const legacySelect = row.querySelector('[data-sub-type]');
@@ -829,7 +859,53 @@ if (!window.__texhubSubOrders) {
         recalcRow(row);
     };
 
-    const addRow = (container) => {
+    const hydrateRow = (row, data) => {
+        if (!row || !data) return;
+        const setField = (field, value) => {
+            const el = row.querySelector(`[name$="[${field}]"]`);
+            if (!el) return;
+            el.value = value ?? '';
+        };
+
+        if (data.order_kind !== undefined) {
+            const kindSelect = row.querySelector('[data-sub-kind]');
+            if (kindSelect) kindSelect.value = data.order_kind ?? '';
+        }
+
+        filterOrderTypes(row);
+
+        if (data.order_type_id !== undefined) {
+            const typeId = row.querySelector('[data-sub-type-id]');
+            const typeSearch = row.querySelector('[data-sub-type-search]');
+            const typeList = row.querySelector('[data-sub-type-list]');
+            if (typeId) typeId.value = data.order_type_id ?? '';
+            if (typeSearch && typeList) {
+                const option = findTypeOptionById(typeList, data.order_type_id);
+                typeSearch.value = option?.value ?? '';
+            }
+        }
+
+        setField('cornice_type_id', data.cornice_type_id);
+        setField('fabric_code_id', data.fabric_code_id);
+        setField('profile_color_id', data.profile_color_id);
+        setField('control_type_id', data.control_type_id);
+        setField('room', data.room);
+        setField('division', data.division);
+        setField('width', data.width);
+        setField('height', data.height);
+        setField('quantity', data.quantity);
+        setField('area', data.area);
+        setField('price', data.price);
+        setField('amount', data.amount);
+        setField('discount', data.discount);
+        setField('total', data.total);
+
+        if (data.area !== undefined) {
+            row.dataset.manualArea = 'true';
+        }
+    };
+
+    const addRow = (container, data) => {
         const list = container.querySelector('[data-suborders-list]');
         const template = container.querySelector('[data-suborder-template]');
         if (!list || !template) return;
@@ -840,6 +916,7 @@ if (!window.__texhubSubOrders) {
         wrapper.innerHTML = html.trim();
         const row = wrapper.firstElementChild;
         if (row) list.appendChild(row);
+        hydrateRow(row, data);
         initRow(row);
         const root = container.closest('form');
         recalcSummary(root);
@@ -914,7 +991,50 @@ if (!window.__texhubSubOrders) {
     const ensureInitialRow = (container) => {
         const list = container.querySelector('[data-suborders-list]');
         if (!list || list.children.length > 0) return;
+        const initialEl = container.querySelector('[data-suborders-initial]');
+        let initialData = [];
+        if (initialEl) {
+            try {
+                initialData = JSON.parse(initialEl.textContent || '[]');
+            } catch (error) {
+                initialData = [];
+            }
+        }
+        if (Array.isArray(initialData) && initialData.length > 0) {
+            initialData.forEach((item) => addRow(container, item));
+            return;
+        }
         addRow(container);
+    };
+
+    const applyFormErrors = (form) => {
+        const script = form?.querySelector('[data-form-errors]');
+        if (!script) return;
+        let errors = {};
+        try {
+            errors = JSON.parse(script.textContent || '{}');
+        } catch (error) {
+            errors = {};
+        }
+
+        Object.entries(errors).forEach(([key, messages]) => {
+            const message = Array.isArray(messages) ? messages[0] : messages;
+            const name = keyToName(key);
+            const selector = window.CSS?.escape ? `[name="${CSS.escape(name)}"]` : `[name="${name}"]`;
+            let field = form.querySelector(selector);
+
+            if (!field && key.startsWith('sub_orders.') && key.endsWith('.order_type_id')) {
+                const index = Number(key.split('.')[1] ?? -1);
+                if (Number.isInteger(index) && index >= 0) {
+                    const row = form.querySelectorAll('[data-suborder-row]')[index];
+                    if (row) field = row.querySelector('[data-sub-type-search]');
+                }
+            }
+
+            if (field) {
+                applyFieldError(field, message);
+            }
+        });
     };
 
     if (document.readyState === 'loading') {
@@ -939,6 +1059,18 @@ if (!window.__texhubSubOrders) {
         );
     } else {
         document.querySelectorAll('[data-suborder-row]').forEach((row) => initRow(row));
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                document.querySelectorAll('form').forEach((form) => applyFormErrors(form));
+            },
+            { once: true },
+        );
+    } else {
+        document.querySelectorAll('form').forEach((form) => applyFormErrors(form));
     }
 }
 
