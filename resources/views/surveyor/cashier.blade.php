@@ -91,13 +91,15 @@
                                     <option value="{{ $kind }}">{{ $kind }}</option>
                                 @endforeach
                             </x-select>
-                            <x-select label="Вид" name="sub_orders[__index__][order_type_id]" placeholder="Выберите вид"
-                                data-sub-type>
+                            <x-input label="Вид" placeholder="Начните вводить"
+                                list="order-type-options-__index__" data-sub-type-search autocomplete="off" />
+                            <datalist id="order-type-options-__index__" data-sub-type-list>
                                 @foreach ($orderTypes as $type)
-                                    <option value="{{ $type->id }}" data-category="{{ $type->category }}"
-                                        data-price="{{ $type->price }}">{{ $type->name }}</option>
+                                    <option value="{{ $type->name }}" data-id="{{ $type->id }}"
+                                        data-category="{{ $type->category }}" data-price="{{ $type->price }}"></option>
                                 @endforeach
-                            </x-select>
+                            </datalist>
+                            <input type="hidden" name="sub_orders[__index__][order_type_id]" data-sub-type-id />
                             <x-select label="Тип карниза" name="sub_orders[__index__][cornice_type_id]"
                                 placeholder="Выберите тип">
                                 @foreach ($corniceTypes as $type)

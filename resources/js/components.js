@@ -663,39 +663,82 @@ if (!window.__texhubSubOrders) {
         return normalized;
     };
 
+    const findTypeOption = (list, value) => {
+        if (!list) return null;
+        const normalized = String(value ?? '').trim().toLowerCase();
+        if (!normalized) return null;
+        return Array.from(list.options).find((option) => String(option.value).trim().toLowerCase() === normalized);
+    };
+
     const filterOrderTypes = (row) => {
         const kindSelect = row.querySelector('[data-sub-kind]');
-        const typeSelect = row.querySelector('[data-sub-type]');
-        if (!kindSelect || !typeSelect) return;
+        const legacySelect = row.querySelector('[data-sub-type]');
+        const typeList = row.querySelector('[data-sub-type-list]');
+        if (!kindSelect) return;
 
         const category = normalizeKind(kindSelect.value);
-        Array.from(typeSelect.options).forEach((option) => {
-            if (!option.value) {
-                option.hidden = false;
-                option.disabled = false;
-                return;
-            }
-            const matches = !category || option.dataset.category === category;
-            option.hidden = !matches;
-            option.disabled = !matches;
-        });
 
-        if (typeSelect.selectedOptions.length && typeSelect.selectedOptions[0]?.disabled) {
-            typeSelect.value = '';
+        if (legacySelect) {
+            Array.from(legacySelect.options).forEach((option) => {
+                if (!option.value) {
+                    option.hidden = false;
+                    option.disabled = false;
+                    return;
+                }
+                const matches = !category || option.dataset.category === category;
+                option.hidden = !matches;
+                option.disabled = !matches;
+            });
+
+            if (legacySelect.selectedOptions.length && legacySelect.selectedOptions[0]?.disabled) {
+                legacySelect.value = '';
+            }
+            return;
         }
+
+        if (!typeList) return;
+        if (!typeList.dataset.originalOptions) {
+            typeList.dataset.originalOptions = typeList.innerHTML;
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = typeList.dataset.originalOptions;
+        const options = Array.from(wrapper.querySelectorAll('option'));
+        const filtered = options.filter((option) => !category || option.dataset.category === category);
+        typeList.innerHTML = '';
+        filtered.forEach((option) => typeList.appendChild(option));
     };
 
     const syncTypePrice = (row) => {
-        const typeSelect = row.querySelector('[data-sub-type]');
         const priceInput = row.querySelector('[data-sub-price]');
-        if (!typeSelect || !priceInput) return;
+        const legacySelect = row.querySelector('[data-sub-type]');
+        const typeSearch = row.querySelector('[data-sub-type-search]');
+        const typeList = row.querySelector('[data-sub-type-list]');
+        const typeId = row.querySelector('[data-sub-type-id]');
+        if (!priceInput) return;
 
-        const option = typeSelect.selectedOptions?.[0];
-        if (!option || !option.value) {
+        if (legacySelect) {
+            const option = legacySelect.selectedOptions?.[0];
+            if (!option || !option.value) {
+                priceInput.value = '';
+                return;
+            }
+
+            if (option.dataset.price !== undefined) {
+                priceInput.value = option.dataset.price;
+            }
+            return;
+        }
+
+        if (!typeSearch || !typeList) return;
+        const option = findTypeOption(typeList, typeSearch.value);
+        if (!option) {
+            if (typeId) typeId.value = '';
             priceInput.value = '';
             return;
         }
 
+        if (typeId) typeId.value = option.dataset.id ?? '';
         if (option.dataset.price !== undefined) {
             priceInput.value = option.dataset.price;
         }
@@ -832,7 +875,7 @@ if (!window.__texhubSubOrders) {
             syncTypePrice(row);
         }
 
-        if (event.target.closest('[data-sub-type]')) {
+        if (event.target.closest('[data-sub-type]') || event.target.closest('[data-sub-type-search]')) {
             syncTypePrice(row);
         }
 
@@ -849,6 +892,9 @@ if (!window.__texhubSubOrders) {
             }
             if (event.target.closest('[data-sub-width]') || event.target.closest('[data-sub-height]')) {
                 row.dataset.manualArea = 'false';
+            }
+            if (event.target.closest('[data-sub-type-search]')) {
+                syncTypePrice(row);
             }
             recalcRow(row);
             recalcSummary(root);
