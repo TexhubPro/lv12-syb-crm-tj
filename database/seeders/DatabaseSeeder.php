@@ -24,5 +24,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '005335051',
             'password' => Hash::make('Shod63mm'),
         ]);
+
+        $this->call(OrderTypeSeeder::class);
     }
 }
