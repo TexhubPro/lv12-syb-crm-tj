@@ -22,6 +22,11 @@
         @if ($errors->any())
             <x-alert variant="danger" title="Ошибка">
                 Проверьте форму и попробуйте снова.
+                <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-rose-700 dark:text-rose-200">
+                    @foreach ($errors->all() as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
             </x-alert>
             <script type="application/json" data-form-errors>
                 @json($errors->getMessages())
