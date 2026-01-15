@@ -14,28 +14,20 @@ class Login extends Component
 
     public function login(): ?\Symfony\Component\HttpFoundation\Response
     {
-        $this->validate([
-            'phone' => ['required', 'string', 'max:30'],
-            'password' => ['required', 'string'],
-        ]);
+
 
         $user = User::where('phone', $this->phone)->first();
-        if (!$user || !Hash::check($this->password, $user->password)) {
-            $this->addError('phone', 'Неверный номер телефона или пароль.');
-            $this->reset('password');
-            return null;
+        if (!$user) {
+            if (Hash::check($this->password, $user->password)) {
+
+                Auth::login($user, true);
+
+                return redirect()->route('admin.dashboard');
+            }
+            return;
         }
+        return;
 
-        Auth::login($user, true);
-
-        $redirect = match ($user?->role) {
-            'manager' => route('manager.dashboard'),
-            'surveyor' => route('surveyor.cashier'),
-            default => route('admin.dashboard'),
-        };
-
-        request()->session()->regenerate();
-        return redirect()->intended($redirect);
     }
 
     public function render()
