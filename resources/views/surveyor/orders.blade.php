@@ -75,11 +75,6 @@
                                             <td class="px-6 py-5 text-sm font-medium text-right whitespace-nowrap">
                                                 <div class="flex items-center justify-end gap-2">
                                                     <x-button size="sm" variant="faded" color="default"
-                                                        icon-only="true" aria-label="Редактировать"
-                                                        href="{{ route('surveyor.orders.edit', $order) }}">
-                                                        <x-icon type="outline" icon="pencil" size="5"></x-icon>
-                                                    </x-button>
-                                                    <x-button size="sm" variant="faded" color="default"
                                                         icon-only="true" aria-label="Скачать чек"
                                                         href="{{ route('surveyor.orders.receipt', $order) }}">
                                                         <x-icon type="outline" icon="file-invoice" size="5"></x-icon>

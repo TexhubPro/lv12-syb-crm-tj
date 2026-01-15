@@ -26,9 +26,6 @@
                     <x-button variant="faded" color="warning" href="{{ route('surveyor.orders.excel', $order) }}">
                         Скачать Excel
                     </x-button>
-                    <x-button variant="faded" color="success" href="{{ route('surveyor.orders.edit', $order) }}">
-                        Редактировать заказ
-                    </x-button>
                     <x-button variant="faded" color="info" href="{{ route('surveyor.orders.index') }}">
                         Вернуться к списку
                     </x-button>

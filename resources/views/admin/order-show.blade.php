@@ -26,9 +26,6 @@
                     <x-button variant="faded" color="warning" href="{{ route('admin.orders.excel', $order) }}">
                         Скачать Excel
                     </x-button>
-                    <x-button variant="faded" color="success" href="{{ route('admin.orders.edit', $order) }}">
-                        Редактировать заказ
-                    </x-button>
                     <form method="POST" action="{{ route('admin.orders.destroy', $order) }}">
                         @csrf
                         @method('DELETE')

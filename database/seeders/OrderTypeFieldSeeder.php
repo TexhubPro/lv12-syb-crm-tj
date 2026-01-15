@@ -15,7 +15,6 @@ class OrderTypeFieldSeeder extends Seeder
             ['key' => 'profile_color', 'name' => 'Цвет профиля'],
             ['key' => 'control_type', 'name' => 'Тип управления'],
             ['key' => 'room', 'name' => 'Комната'],
-            ['key' => 'division', 'name' => 'Разделения'],
             ['key' => 'width', 'name' => 'Ширина'],
             ['key' => 'height', 'name' => 'Высота'],
             ['key' => 'quantity', 'name' => 'Кол-во'],
@@ -25,12 +24,6 @@ class OrderTypeFieldSeeder extends Seeder
             ['key' => 'discount', 'name' => 'Скидка'],
             ['key' => 'total', 'name' => 'Итого'],
             ['key' => 'note', 'name' => 'Примечания'],
-            ['key' => 'corsage', 'name' => 'Карсаж'],
-            ['key' => 'tape', 'name' => 'Лента'],
-            ['key' => 'sewing', 'name' => 'Пошив'],
-            ['key' => 'installation', 'name' => 'Монтаж'],
-            ['key' => 'motor', 'name' => 'Мотор'],
-            ['key' => 'tiebacks', 'name' => 'Прихваты'],
         ];
 
         foreach ($fields as $field) {

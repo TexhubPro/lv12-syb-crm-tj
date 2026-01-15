@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
@@ -24,6 +25,7 @@ class EmployeeController extends Controller
             'role' => ['required', Rule::in(['manager', 'admin', 'surveyor'])],
         ]);
 
+        $validated['password'] = Hash::make($validated['password']);
         User::create($validated);
 
         return back()->with('status', 'Сотрудник добавлен.');
@@ -40,6 +42,8 @@ class EmployeeController extends Controller
 
         if ($validated['password'] === null || $validated['password'] === '') {
             unset($validated['password']);
+        } else {
+            $validated['password'] = Hash::make($validated['password']);
         }
 
         $employee->update($validated);

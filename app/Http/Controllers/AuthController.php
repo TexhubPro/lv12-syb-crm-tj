@@ -19,7 +19,13 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt(['phone' => $validated['phone'], 'password' => $validated['password']], true)) {
+        $digits = preg_replace('/\D+/', '', $validated['phone']);
+        $trimmedZeros = ltrim($digits, '0');
+
+        if (
+            Auth::attempt(['phone' => $digits, 'password' => $validated['password']], true) ||
+            ($trimmedZeros !== '' && Auth::attempt(['phone' => $trimmedZeros, 'password' => $validated['password']], true))
+        ) {
             $request->session()->regenerate();
             $user = $request->user();
             $redirect = match ($user?->role) {

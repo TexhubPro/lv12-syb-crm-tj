@@ -63,8 +63,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/admin/orders', [OrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
-    Route::get('/admin/orders/{order}/edit', [OrderController::class, 'edit'])->name('admin.orders.edit');
-    Route::put('/admin/orders/{order}', [OrderController::class, 'update'])->name('admin.orders.update');
     Route::get('/admin/orders/{order}/receipt', [OrderController::class, 'downloadReceipt'])->name('admin.orders.receipt');
     Route::get('/admin/orders/{order}/excel', [OrderController::class, 'downloadExcel'])->name('admin.orders.excel');
     Route::delete('/admin/orders/{order}', [OrderController::class, 'destroy'])->name('admin.orders.destroy');
@@ -90,8 +88,6 @@ Route::prefix('manager')->middleware(['auth', 'manager'])->group(function () {
 
     Route::get('/orders', [ManagerOrderController::class, 'index'])->name('manager.orders.index');
     Route::get('/orders/{order}', [ManagerOrderController::class, 'show'])->name('manager.orders.show');
-    Route::get('/orders/{order}/edit', [ManagerOrderController::class, 'edit'])->name('manager.orders.edit');
-    Route::put('/orders/{order}', [ManagerOrderController::class, 'update'])->name('manager.orders.update');
     Route::get('/orders/{order}/receipt', [ManagerOrderController::class, 'downloadReceipt'])->name('manager.orders.receipt');
     Route::get('/orders/{order}/excel', [ManagerOrderController::class, 'downloadExcel'])->name('manager.orders.excel');
     Route::delete('/orders/{order}', [ManagerOrderController::class, 'destroy'])->name('manager.orders.destroy');
@@ -103,8 +99,6 @@ Route::prefix('surveyor')->middleware(['auth', 'surveyor'])->group(function () {
 
     Route::get('/orders', [SurveyorOrderController::class, 'index'])->name('surveyor.orders.index');
     Route::get('/orders/{order}', [SurveyorOrderController::class, 'show'])->name('surveyor.orders.show');
-    Route::get('/orders/{order}/edit', [SurveyorOrderController::class, 'edit'])->name('surveyor.orders.edit');
-    Route::put('/orders/{order}', [SurveyorOrderController::class, 'update'])->name('surveyor.orders.update');
     Route::get('/orders/{order}/receipt', [SurveyorOrderController::class, 'downloadReceipt'])->name('surveyor.orders.receipt');
     Route::get('/orders/{order}/excel', [SurveyorOrderController::class, 'downloadExcel'])->name('surveyor.orders.excel');
     Route::delete('/orders/{order}', [SurveyorOrderController::class, 'destroy'])->name('surveyor.orders.destroy');
