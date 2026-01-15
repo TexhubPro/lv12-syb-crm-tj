@@ -20,19 +20,36 @@ class OrderExport implements FromView, WithStyles, ShouldAutoSize
         $order = $this->order->load([
             'client',
             'user',
-            'subOrders.orderType',
+            'subOrders.orderType.parent',
+            'subOrders.orderType.fields',
             'subOrders.corniceType',
             'subOrders.profileColor',
             'subOrders.fabricCode',
             'subOrders.controlType',
         ]);
+        $subOrders = $order->subOrders
+            ->sortBy(fn($subOrder) => [
+                $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '',
+                $subOrder->orderType?->name ?? '',
+                $subOrder->id ?? 0,
+            ])
+            ->values();
+        $subOrdersAmount = $subOrders->sum('amount');
+        $subOrdersTotal = $subOrders->sum('total');
+        $subOrdersArea = $subOrders->sum('area');
+        $subOrdersDiscount = $subOrders->sum(function ($subOrder) {
+            $amount = (float) ($subOrder->amount ?? 0);
+            $total = (float) ($subOrder->total ?? 0);
+            return max(0, $amount - $total);
+        });
 
         return view('admin.exports.order-excel', [
             'order' => $order,
-            'subOrdersAmount' => $order->subOrders->sum('amount'),
-            'subOrdersDiscount' => $order->subOrders->sum('discount'),
-            'subOrdersTotal' => $order->subOrders->sum('total'),
-            'subOrdersArea' => $order->subOrders->sum('area'),
+            'subOrders' => $subOrders,
+            'subOrdersAmount' => $subOrdersAmount,
+            'subOrdersDiscount' => $subOrdersDiscount,
+            'subOrdersTotal' => $subOrdersTotal,
+            'subOrdersArea' => $subOrdersArea,
         ]);
     }
 

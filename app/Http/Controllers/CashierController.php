@@ -8,6 +8,7 @@ use App\Models\CorniceType;
 use App\Models\FabricCode;
 use App\Models\Order;
 use App\Models\OrderType;
+use App\Models\OrderTypeField;
 use App\Models\ProfileColor;
 use App\Models\SubOrder;
 use Illuminate\Http\Request;
@@ -22,7 +23,8 @@ class CashierController extends Controller
             'corniceTypes' => CorniceType::orderBy('name')->get(),
             'controlTypes' => ControlType::orderBy('name')->get(),
             'fabricCodes' => FabricCode::orderBy('name')->get(),
-            'orderTypes' => OrderType::orderBy('name')->get(),
+            'orderTypes' => OrderType::with('fields')->orderBy('name')->get(),
+            'orderTypeFields' => OrderTypeField::orderBy('id')->get(),
             'profileColors' => ProfileColor::orderBy('name')->get(),
         ]);
     }
@@ -45,6 +47,30 @@ class CashierController extends Controller
             'balance_amount' => ['nullable', 'numeric'],
             'rework_amount' => ['nullable', 'numeric'],
             'grand_total' => ['nullable', 'numeric'],
+            'parent_orders' => ['nullable', 'array'],
+            'parent_orders.*.order_kind' => ['required', 'string', 'max:255'],
+            'parent_orders.*.order_type_id' => ['nullable', 'exists:order_types,id'],
+            'parent_orders.*.profile_color_id' => ['nullable', 'exists:profile_colors,id'],
+            'parent_orders.*.cornice_type_id' => ['nullable', 'exists:cornice_types,id'],
+            'parent_orders.*.division' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.fabric_code_id' => ['nullable', 'exists:fabric_codes,id'],
+            'parent_orders.*.control_type_id' => ['nullable', 'exists:control_types,id'],
+            'parent_orders.*.width' => ['nullable', 'numeric'],
+            'parent_orders.*.height' => ['nullable', 'numeric'],
+            'parent_orders.*.quantity' => ['nullable', 'integer'],
+            'parent_orders.*.area' => ['nullable', 'numeric'],
+            'parent_orders.*.price' => ['nullable', 'numeric'],
+            'parent_orders.*.amount' => ['nullable', 'numeric'],
+            'parent_orders.*.discount' => ['nullable', 'numeric'],
+            'parent_orders.*.total' => ['nullable', 'numeric'],
+            'parent_orders.*.room' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.note' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.corsage' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.tape' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.sewing' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.installation' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.motor' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.tiebacks' => ['nullable', 'string', 'max:255'],
             'sub_orders' => ['nullable', 'array'],
             'sub_orders.*.order_type_id' => ['nullable', 'exists:order_types,id'],
             'sub_orders.*.profile_color_id' => ['nullable', 'exists:profile_colors,id'],
@@ -62,6 +88,13 @@ class CashierController extends Controller
             'sub_orders.*.discount' => ['nullable', 'numeric'],
             'sub_orders.*.total' => ['nullable', 'numeric'],
             'sub_orders.*.room' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.note' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.corsage' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.tape' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.sewing' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.installation' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.motor' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.tiebacks' => ['nullable', 'string', 'max:255'],
         ]);
 
         $clientId = $validated['client_id'] ?? null;
@@ -92,13 +125,12 @@ class CashierController extends Controller
             'grand_total' => $validated['grand_total'] ?? 0,
         ]);
 
-        $subOrders = $validated['sub_orders'] ?? [];
-        foreach ($subOrders as $subOrder) {
-            $hasSubOrder = collect($subOrder)->filter(function ($value) {
+        $createSubOrder = function (array $subOrder) use ($order) {
+            $hasSubOrder = collect($subOrder)->except(['order_kind'])->filter(function ($value) {
                 return $value !== null && $value !== '';
             })->isNotEmpty();
             if (!$hasSubOrder) {
-                continue;
+                return;
             }
 
             SubOrder::create([
@@ -119,7 +151,24 @@ class CashierController extends Controller
                 'discount' => $subOrder['discount'] ?? 0,
                 'total' => $subOrder['total'] ?? 0,
                 'room' => $subOrder['room'] ?? null,
+                'note' => $subOrder['note'] ?? null,
+                'corsage' => $subOrder['corsage'] ?? null,
+                'tape' => $subOrder['tape'] ?? null,
+                'sewing' => $subOrder['sewing'] ?? null,
+                'installation' => $subOrder['installation'] ?? null,
+                'motor' => $subOrder['motor'] ?? null,
+                'tiebacks' => $subOrder['tiebacks'] ?? null,
             ]);
+        };
+
+        $parentOrders = $validated['parent_orders'] ?? [];
+        foreach ($parentOrders as $parentOrder) {
+            $createSubOrder($parentOrder);
+        }
+
+        $subOrders = $validated['sub_orders'] ?? [];
+        foreach ($subOrders as $subOrder) {
+            $createSubOrder($subOrder);
         }
 
         return redirect()->route('admin.orders.show', $order)->with('status', 'Заказ создан.');

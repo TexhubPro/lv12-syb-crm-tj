@@ -84,6 +84,30 @@ class SurveyorOrderController extends Controller
             'balance_amount' => ['nullable', 'numeric'],
             'rework_amount' => ['nullable', 'numeric'],
             'grand_total' => ['nullable', 'numeric'],
+            'parent_orders' => ['nullable', 'array'],
+            'parent_orders.*.order_kind' => ['required', 'string', 'max:255'],
+            'parent_orders.*.order_type_id' => ['nullable', 'exists:order_types,id'],
+            'parent_orders.*.profile_color_id' => ['nullable', 'exists:profile_colors,id'],
+            'parent_orders.*.cornice_type_id' => ['nullable', 'exists:cornice_types,id'],
+            'parent_orders.*.division' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.fabric_code_id' => ['nullable', 'exists:fabric_codes,id'],
+            'parent_orders.*.control_type_id' => ['nullable', 'exists:control_types,id'],
+            'parent_orders.*.width' => ['nullable', 'numeric'],
+            'parent_orders.*.height' => ['nullable', 'numeric'],
+            'parent_orders.*.quantity' => ['nullable', 'integer'],
+            'parent_orders.*.area' => ['nullable', 'numeric'],
+            'parent_orders.*.price' => ['nullable', 'numeric'],
+            'parent_orders.*.amount' => ['nullable', 'numeric'],
+            'parent_orders.*.discount' => ['nullable', 'numeric'],
+            'parent_orders.*.total' => ['nullable', 'numeric'],
+            'parent_orders.*.room' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.note' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.corsage' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.tape' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.sewing' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.installation' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.motor' => ['nullable', 'string', 'max:255'],
+            'parent_orders.*.tiebacks' => ['nullable', 'string', 'max:255'],
             'sub_orders' => ['nullable', 'array'],
             'sub_orders.*.order_kind' => ['required', 'string', 'max:255'],
             'sub_orders.*.order_type_id' => ['nullable', 'exists:order_types,id'],
@@ -101,6 +125,13 @@ class SurveyorOrderController extends Controller
             'sub_orders.*.discount' => ['nullable', 'numeric'],
             'sub_orders.*.total' => ['nullable', 'numeric'],
             'sub_orders.*.room' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.note' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.corsage' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.tape' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.sewing' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.installation' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.motor' => ['nullable', 'string', 'max:255'],
+            'sub_orders.*.tiebacks' => ['nullable', 'string', 'max:255'],
         ]);
 
         $clientId = $validated['client_id'] ?? $order->client_id;
@@ -130,13 +161,12 @@ class SurveyorOrderController extends Controller
 
         $order->subOrders()->delete();
 
-        $subOrders = $validated['sub_orders'] ?? [];
-        foreach ($subOrders as $subOrder) {
-            $hasSubOrder = collect($subOrder)->filter(function ($value) {
+        $createSubOrder = function (array $subOrder) use ($order) {
+            $hasSubOrder = collect($subOrder)->except(['order_kind'])->filter(function ($value) {
                 return $value !== null && $value !== '';
             })->isNotEmpty();
             if (!$hasSubOrder) {
-                continue;
+                return;
             }
 
             SubOrder::create([
@@ -157,7 +187,24 @@ class SurveyorOrderController extends Controller
                 'discount' => $subOrder['discount'] ?? 0,
                 'total' => $subOrder['total'] ?? 0,
                 'room' => $subOrder['room'] ?? null,
+                'note' => $subOrder['note'] ?? null,
+                'corsage' => $subOrder['corsage'] ?? null,
+                'tape' => $subOrder['tape'] ?? null,
+                'sewing' => $subOrder['sewing'] ?? null,
+                'installation' => $subOrder['installation'] ?? null,
+                'motor' => $subOrder['motor'] ?? null,
+                'tiebacks' => $subOrder['tiebacks'] ?? null,
             ]);
+        };
+
+        $parentOrders = $validated['parent_orders'] ?? [];
+        foreach ($parentOrders as $parentOrder) {
+            $createSubOrder($parentOrder);
+        }
+
+        $subOrders = $validated['sub_orders'] ?? [];
+        foreach ($subOrders as $subOrder) {
+            $createSubOrder($subOrder);
         }
 
         return redirect()->route('surveyor.orders.show', $order)->with('status', 'Заказ обновлен.');
@@ -175,19 +222,36 @@ class SurveyorOrderController extends Controller
         $order->load([
             'client',
             'user',
-            'subOrders.orderType',
+            'subOrders.orderType.parent',
+            'subOrders.orderType.fields',
             'subOrders.corniceType',
             'subOrders.profileColor',
             'subOrders.fabricCode',
             'subOrders.controlType',
         ]);
+        $subOrders = $order->subOrders
+            ->sortBy(fn($subOrder) => [
+                $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '',
+                $subOrder->orderType?->name ?? '',
+                $subOrder->id ?? 0,
+            ])
+            ->values();
+        $subOrdersAmount = $subOrders->sum('amount');
+        $subOrdersTotal = $subOrders->sum('total');
+        $subOrdersArea = $subOrders->sum('area');
+        $subOrdersDiscount = $subOrders->sum(function ($subOrder) {
+            $amount = (float) ($subOrder->amount ?? 0);
+            $total = (float) ($subOrder->total ?? 0);
+            return max(0, $amount - $total);
+        });
 
         $pdf = Pdf::loadView('admin.exports.order-receipt', [
             'order' => $order,
-            'subOrdersAmount' => $order->subOrders->sum('amount'),
-            'subOrdersDiscount' => $order->subOrders->sum('discount'),
-            'subOrdersTotal' => $order->subOrders->sum('total'),
-            'subOrdersArea' => $order->subOrders->sum('area'),
+            'subOrders' => $subOrders,
+            'subOrdersAmount' => $subOrdersAmount,
+            'subOrdersDiscount' => $subOrdersDiscount,
+            'subOrdersTotal' => $subOrdersTotal,
+            'subOrdersArea' => $subOrdersArea,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download("order-{$order->id}.pdf");

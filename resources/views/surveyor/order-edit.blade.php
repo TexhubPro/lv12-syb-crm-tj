@@ -113,7 +113,7 @@
                                 </div>
                                 <div class="mt-4 grid gap-3 lg:grid-cols-8">
                                     <x-select label="Тип" name="sub_orders[{{ $index }}][order_kind]"
-                                        placeholder="Выберите тип" required="true">
+                                        placeholder="Выберите тип" required="true" data-sub-kind>
                                         @foreach (['Штора', 'Жалюзи', 'Плиссе'] as $kind)
                                             <option value="{{ $kind }}" @selected(($subOrder['order_kind'] ?? '') === $kind)>
                                                 {{ $kind }}
@@ -121,9 +121,11 @@
                                         @endforeach
                                     </x-select>
                                     <x-select label="Вид" name="sub_orders[{{ $index }}][order_type_id]"
-                                        placeholder="Выберите вид">
+                                        placeholder="Выберите вид" data-sub-type>
                                         @foreach ($orderTypes as $type)
-                                            <option value="{{ $type->id }}" @selected(($subOrder['order_type_id'] ?? null) == $type->id)>
+                                            <option value="{{ $type->id }}" data-category="{{ $type->category }}"
+                                                data-unit="{{ $type->unit }}" data-min-qty="{{ $type->min_qty }}"
+                                                @selected(($subOrder['order_type_id'] ?? null) == $type->id)>
                                                 {{ $type->name }}
                                             </option>
                                         @endforeach
@@ -205,15 +207,18 @@
                         </div>
                         <div class="mt-4 grid gap-3 lg:grid-cols-8">
                             <x-select label="Тип" name="sub_orders[__index__][order_kind]" placeholder="Выберите тип"
-                                required="true">
+                                required="true" data-sub-kind>
                                 @foreach (['Штора', 'Жалюзи', 'Плиссе'] as $kind)
                                     <option value="{{ $kind }}">{{ $kind }}</option>
                                 @endforeach
                             </x-select>
                             <x-select label="Вид" name="sub_orders[__index__][order_type_id]"
-                                placeholder="Выберите вид">
+                                placeholder="Выберите вид" data-sub-type>
                                 @foreach ($orderTypes as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    <option value="{{ $type->id }}" data-category="{{ $type->category }}"
+                                        data-unit="{{ $type->unit }}" data-min-qty="{{ $type->min_qty }}">
+                                        {{ $type->name }}
+                                    </option>
                                 @endforeach
                             </x-select>
                             <x-select label="Тип карниза" name="sub_orders[__index__][cornice_type_id]"

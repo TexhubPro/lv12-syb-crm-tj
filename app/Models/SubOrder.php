@@ -27,6 +27,13 @@ class SubOrder extends Model
         'discount',
         'total',
         'room',
+        'note',
+        'corsage',
+        'tape',
+        'sewing',
+        'installation',
+        'motor',
+        'tiebacks',
     ];
 
     public function order()

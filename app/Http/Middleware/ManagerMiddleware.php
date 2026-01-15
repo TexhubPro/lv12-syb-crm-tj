@@ -15,11 +15,13 @@ class ManagerMiddleware
             return redirect()->route('login');
         }
 
-        if ($request->is('/')) {
-            return redirect()->route('manager.dashboard');
-        }
-
         if ($user->role !== 'manager') {
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            if ($user->role === 'surveyor') {
+                return redirect()->route('surveyor.cashier');
+            }
             abort(403);
         }
 

@@ -107,7 +107,8 @@
                             <datalist id="order-type-options-__index__" data-sub-type-list>
                                 @foreach ($orderTypes as $type)
                                     <option value="{{ $type->name }}" data-id="{{ $type->id }}"
-                                        data-category="{{ $type->category }}" data-price="{{ $type->price }}"></option>
+                                        data-category="{{ $type->category }}" data-price="{{ $type->price }}"
+                                        data-unit="{{ $type->unit }}" data-min-qty="{{ $type->min_qty }}"></option>
                                 @endforeach
                             </datalist>
                             <input type="hidden" name="sub_orders[__index__][order_type_id]" data-sub-type-id />

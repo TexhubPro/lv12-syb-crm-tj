@@ -18,13 +18,15 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        //     'phone' => '005335051',
-        //     'password' => Hash::make('Shod63mm'),
-        // ]);
+        User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'phone' => '005335051',
+            'password' => Hash::make('Shod63mm'),
+            'role' => 'admin'
+        ]);
 
-        $this->call(OrderTypeSeeder::class);
+        $this->call(OrderTypeFieldSeeder::class);
+        // $this->call(OrderTypeSeeder::class);
     }
 }

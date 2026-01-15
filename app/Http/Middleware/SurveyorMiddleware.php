@@ -15,11 +15,13 @@ class SurveyorMiddleware
             return redirect()->route('login');
         }
 
-        if ($request->is('/')) {
-            return redirect()->route('surveyor.cashier');
-        }
-
         if ($user->role !== 'surveyor') {
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            if ($user->role === 'manager') {
+                return redirect()->route('manager.dashboard');
+            }
             abort(403);
         }
 

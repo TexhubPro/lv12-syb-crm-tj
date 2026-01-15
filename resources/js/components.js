@@ -652,6 +652,15 @@ if (!window.__texhubSubOrders) {
         return Number.isFinite(num) ? num : 0;
     };
 
+    const isVisibleField = (field) => {
+        if (!field) return false;
+        if (field.disabled) return false;
+        if (field.classList.contains('hidden')) return false;
+        const wrapper = field.closest('.hidden');
+        if (wrapper) return false;
+        return true;
+    };
+
     const getCalcMode = (row) => row.closest('[data-suborders]')?.dataset.subordersCalc;
 
     const normalizeKind = (value) => {
@@ -774,6 +783,32 @@ if (!window.__texhubSubOrders) {
         }
     };
 
+    const getTypeMeta = (row) => {
+        const legacySelect = row.querySelector('[data-sub-type]');
+        const typeSearch = row.querySelector('[data-sub-type-search]');
+        const typeList = row.querySelector('[data-sub-type-list]');
+
+        if (legacySelect) {
+            const option = legacySelect.selectedOptions?.[0];
+            if (!option || !option.value) return {};
+            return {
+                unit: option.dataset.unit || '',
+                minQty: toNumber(option.dataset.minQty),
+            };
+        }
+
+        if (typeSearch && typeList) {
+            const option = findTypeOption(typeList, typeSearch.value);
+            if (!option) return {};
+            return {
+                unit: option.dataset.unit || '',
+                minQty: toNumber(option.dataset.minQty),
+            };
+        }
+
+        return {};
+    };
+
     const ensureQtyDefault = (row) => {
         const qtyInput = row.querySelector('[data-sub-qty]');
         if (!qtyInput) return;
@@ -795,11 +830,28 @@ if (!window.__texhubSubOrders) {
         if (areaInput && !manualArea) areaInput.value = area ? area.toFixed(2) : '';
 
         const price = toNumber(priceInput?.value);
+        const { unit, minQty } = getTypeMeta(row);
         const calcMode = getCalcMode(row);
-        const amount = calcMode === 'width-price' ? (width / 100) * price * qty : price * qty;
+        let amount = 0;
+
+        if (unit) {
+            let perItem = 1;
+            if (unit === 'meter') {
+                perItem = width ? width / 100 : 0;
+            } else if (unit === 'square_meter') {
+                perItem = area;
+            }
+            if (minQty > 0 && perItem > 0) {
+                perItem = Math.max(perItem, minQty);
+            }
+            amount = price * perItem * qty;
+        } else {
+            amount = calcMode === 'width-price' ? (width / 100) * price * qty : price * qty;
+        }
         if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
-        const discount = toNumber(discountInput?.value);
-        const total = amount - discount;
+        const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
+        const discountValue = amount * (discountPercent / 100);
+        const total = amount - discountValue;
         if (totalInput) totalInput.value = total ? total.toFixed(2) : '';
     };
 
@@ -811,10 +863,69 @@ if (!window.__texhubSubOrders) {
         let sumArea = 0;
 
         root.querySelectorAll('[data-suborder-row]').forEach((row) => {
+            const amount = toNumber(row.querySelector('[data-sub-amount]')?.value);
+            const discountInput = row.querySelector('[data-sub-discount]');
+            const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
+            const discountValue = amount * (discountPercent / 100);
+            const total = amount - discountValue;
             sumArea += toNumber(row.querySelector('[data-sub-area]')?.value);
-            sumAmount += toNumber(row.querySelector('[data-sub-amount]')?.value);
-            sumDiscount += toNumber(row.querySelector('[data-sub-discount]')?.value);
-            sumTotal += toNumber(row.querySelector('[data-sub-total]')?.value);
+            sumAmount += amount;
+            sumDiscount += discountValue;
+            sumTotal += total;
+        });
+
+        root.querySelectorAll('[data-parent-block]').forEach((block) => {
+            const parentSelect = block.querySelector('[data-parent-select]');
+            const parentOption = parentSelect?.selectedOptions?.[0];
+            const unit = parentOption?.dataset?.unit ?? '';
+            const minQty = toNumber(parentOption?.dataset?.minQty);
+            const typePrice = toNumber(parentOption?.dataset?.price);
+
+            const widthInput = block.querySelector('[data-parent-width]');
+            const heightInput = block.querySelector('[data-parent-height]');
+            const qtyInput = block.querySelector('[data-parent-qty]');
+            const areaInput = block.querySelector('[data-parent-area]');
+            const priceInput = block.querySelector('[data-parent-price]');
+            const amountInput = block.querySelector('[data-parent-amount]');
+            const discountInput = block.querySelector('[data-parent-discount]');
+            const totalInput = block.querySelector('[data-parent-total]');
+
+            const width = toNumber(widthInput?.value);
+            const height = toNumber(heightInput?.value);
+            let qty = toNumber(qtyInput?.value);
+            if (!qty && qtyInput && isVisibleField(qtyInput)) qty = 1;
+            let area = toNumber(areaInput?.value);
+            const manualArea = areaInput?.dataset?.manual === 'true';
+            if (!manualArea && width && height) {
+                area = (width * height) / 10000;
+                if (areaInput) areaInput.value = area ? area.toFixed(2) : '';
+            }
+
+            let price = isVisibleField(priceInput) ? toNumber(priceInput?.value) : 0;
+            if (!price) price = typePrice;
+
+            let perItem = 1;
+            if (unit === 'meter') {
+                perItem = width ? width / 100 : 0;
+            } else if (unit === 'square_meter') {
+                perItem = area;
+            } else if (unit === 'piece') {
+                perItem = qty;
+            }
+            if ((unit === 'meter' || unit === 'square_meter') && minQty > 0 && perItem > 0) {
+                perItem = Math.max(perItem, minQty);
+            }
+            const amount = price * perItem;
+            if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
+            const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
+            const discountValue = amount * (discountPercent / 100);
+            const total = amount - discountValue;
+            if (totalInput) totalInput.value = total ? total.toFixed(2) : '';
+
+            sumArea += area;
+            sumAmount += amount;
+            sumDiscount += discountValue;
+            sumTotal += total;
         });
 
         root.querySelector('[data-summary-amount]')?.replaceChildren(document.createTextNode(sumAmount.toFixed(2)));
@@ -962,6 +1073,7 @@ if (!window.__texhubSubOrders) {
 
     document.addEventListener('input', (event) => {
         const row = event.target.closest('[data-suborder-row]');
+        const parentBlock = event.target.closest('[data-parent-block]');
         const root = event.target.closest('form');
         if (row) {
             if (event.target.closest('[data-sub-area]')) {
@@ -977,6 +1089,17 @@ if (!window.__texhubSubOrders) {
             recalcSummary(root);
             return;
         }
+        if (parentBlock) {
+            if (event.target.closest('[data-parent-area]')) {
+                event.target.dataset.manual = 'true';
+            }
+            if (event.target.closest('[data-parent-width]') || event.target.closest('[data-parent-height]')) {
+                const areaInput = parentBlock.querySelector('[data-parent-area]');
+                if (areaInput) areaInput.dataset.manual = 'false';
+            }
+            recalcSummary(root);
+            return;
+        }
 
         if (!root) return;
         if (event.target.matches('[data-order-total]')) {
@@ -988,9 +1111,18 @@ if (!window.__texhubSubOrders) {
         recalcSummary(root);
     });
 
+    document.addEventListener('recalc-summary', (event) => {
+        const root = event.target.closest ? event.target.closest('form') : null;
+        if (!root) return;
+        recalcSummary(root);
+    });
+
     const ensureInitialRow = (container) => {
         const list = container.querySelector('[data-suborders-list]');
         if (!list || list.children.length > 0) return;
+        if (container.dataset.subordersNoInitial === 'true') {
+            return;
+        }
         const initialEl = container.querySelector('[data-suborders-initial]');
         let initialData = [];
         if (initialEl) {
