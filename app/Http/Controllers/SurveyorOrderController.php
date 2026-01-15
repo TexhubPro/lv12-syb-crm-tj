@@ -35,15 +35,37 @@ class SurveyorOrderController extends Controller
         $order->load([
             'client',
             'user',
-            'subOrders.orderType',
+            'subOrders.orderType.parent',
+            'subOrders.orderType.fields',
             'subOrders.corniceType',
             'subOrders.profileColor',
             'subOrders.fabricCode',
             'subOrders.controlType',
         ]);
 
+        $subOrders = $order->subOrders
+            ->sortBy(fn($subOrder) => [
+                $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '',
+                $subOrder->orderType?->name ?? '',
+                $subOrder->id ?? 0,
+            ])
+            ->values();
+        $subOrdersAmount = $subOrders->sum('amount');
+        $subOrdersTotal = $subOrders->sum('total');
+        $subOrdersArea = $subOrders->sum('area');
+        $subOrdersDiscount = $subOrders->sum(function ($subOrder) {
+            $amount = (float) ($subOrder->amount ?? 0);
+            $total = (float) ($subOrder->total ?? 0);
+            return max(0, $amount - $total);
+        });
+
         return view('surveyor.order-show', [
             'order' => $order,
+            'subOrders' => $subOrders,
+            'subOrdersAmount' => $subOrdersAmount,
+            'subOrdersDiscount' => $subOrdersDiscount,
+            'subOrdersTotal' => $subOrdersTotal,
+            'subOrdersArea' => $subOrdersArea,
         ]);
     }
 

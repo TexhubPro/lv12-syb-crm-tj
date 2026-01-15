@@ -893,7 +893,10 @@ if (!window.__texhubSubOrders) {
             const width = toNumber(widthInput?.value);
             const height = toNumber(heightInput?.value);
             let qty = toNumber(qtyInput?.value);
-            if (!qty && qtyInput && isVisibleField(qtyInput)) qty = 1;
+            if (!qty && qtyInput && isVisibleField(qtyInput)) {
+                qtyInput.value = '1';
+                qty = 1;
+            }
             let area = toNumber(areaInput?.value);
             const manualArea = areaInput?.dataset?.manual === 'true';
             if (!manualArea && width && height) {
