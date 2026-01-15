@@ -10,7 +10,7 @@ class Login extends Component
     public string $phone = '';
     public string $password = '';
 
-    public function login(): ?\Symfony\Component\HttpFoundation\Response
+    public function login()
     {
         $validated = $this->validate([
             'phone' => ['required', 'string', 'max:30'],
