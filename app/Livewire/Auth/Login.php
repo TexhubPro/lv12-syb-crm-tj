@@ -24,9 +24,10 @@ class Login extends Component
 
                 return redirect()->route('admin.dashboard');
             }
-            return;
+            return redirect()->route('login');
         }
-        return;
+        return redirect()->route('login');
+
 
     }
 
