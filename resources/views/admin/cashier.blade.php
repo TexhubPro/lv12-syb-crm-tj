@@ -1,12 +1,12 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Касса')
+@section('title', 'Оформить заказ')
 
 @section('content')
     <div class="grid gap-3">
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
-                <p class="text-xs uppercase tracking-[0.4em] text-slate-500 dark:text-slate-500">Касса</p>
+                <p class="text-xs uppercase tracking-[0.4em] text-slate-500 dark:text-slate-500">Оформить заказ</p>
                 <h1 class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">Оформление заказа</h1>
                 <p class="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
                     Заполните данные по клиенту, заказу и позиции. Основной идентификатор клиента — номер телефона.

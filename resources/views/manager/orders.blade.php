@@ -89,6 +89,15 @@
                                                         href="{{ route('manager.orders.show', $order) }}">
                                                         <x-icon type="outline" icon="eye" size="5"></x-icon>
                                                     </x-button>
+                                                    <form method="POST"
+                                                        action="{{ route('manager.orders.destroy', $order) }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <x-button type="submit" size="sm" variant="ghost"
+                                                            color="danger" icon-only="true" aria-label="Удалить">
+                                                            <x-icon type="outline" icon="trash" size="5"></x-icon>
+                                                        </x-button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>

@@ -72,7 +72,7 @@
                 class="flex h-9 w-9 items-center justify-center rounded-xl {{ request()->routeIs('admin.cashier') ? 'bg-indigo-500/15 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-200' : 'bg-slate-900/5 text-slate-600 dark:bg-slate-800/70 dark:text-slate-200' }}">
                 <x-icon type="outline" icon="cash-register" size="5"></x-icon>
             </span>
-            Касса
+            Оформить заказ
         </a>
         <a href="{{ route('admin.orders.index') }}"
             class="group flex items-center gap-3 rounded-2xl px-2 py-1.5 text-sm font-medium transition
