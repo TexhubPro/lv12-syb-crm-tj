@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Livewire\Auth\Login;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\ClientController;
@@ -104,11 +105,9 @@ Route::prefix('surveyor')->middleware(['auth', 'surveyor'])->group(function () {
     Route::delete('/orders/{order}', [SurveyorOrderController::class, 'destroy'])->name('surveyor.orders.destroy');
 });
 
-Route::get('/login', [AuthController::class, 'showLogin'])
+Route::get('/login', Login::class)
     ->middleware('guest')
     ->name('login');
-Route::post('/login', [AuthController::class, 'login'])
-    ->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
