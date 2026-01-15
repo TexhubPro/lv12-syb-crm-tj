@@ -2,10 +2,8 @@
 
 namespace App\Livewire\Auth;
 
-use App\Models\User;
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Livewire\Component;
 
 class Login extends Component
 {
@@ -14,21 +12,34 @@ class Login extends Component
 
     public function login(): ?\Symfony\Component\HttpFoundation\Response
     {
+        $validated = $this->validate([
+            'phone' => ['required', 'string', 'max:30'],
+            'password' => ['required', 'string'],
+        ]);
 
+        $digits = preg_replace('/\D+/', '', $validated['phone']);
+        $trimmedZeros = ltrim($digits, '0');
 
-        $user = User::where('phone', $this->phone)->first();
-        if (!$user) {
-            if (Hash::check($this->password, $user->password)) {
-
-                Auth::login($user, true);
-
-                return redirect()->route('admin.dashboard');
-            }
-            return redirect()->route('login');
+        $authenticated = Auth::attempt(['phone' => $digits, 'password' => $validated['password']], true);
+        if (!$authenticated && $trimmedZeros !== '') {
+            $authenticated = Auth::attempt(['phone' => $trimmedZeros, 'password' => $validated['password']], true);
         }
-        return redirect()->route('login');
 
+        if (!$authenticated) {
+            $this->addError('phone', 'Неверный номер телефона или пароль.');
+            $this->reset('password');
+            return null;
+        }
 
+        request()->session()->regenerate();
+        $user = Auth::user();
+        $redirect = match ($user?->role) {
+            'manager' => route('manager.dashboard'),
+            'surveyor' => route('surveyor.cashier'),
+            default => route('admin.dashboard'),
+        };
+
+        return redirect()->intended($redirect);
     }
 
     public function render()
