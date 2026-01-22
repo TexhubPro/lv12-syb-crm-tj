@@ -494,6 +494,7 @@
                             const parentSelect = block.querySelector('[data-parent-select]');
                             const parentFields = block.querySelector('[data-parent-fields]');
                             const childAdd = block.querySelector('[data-child-add]');
+                            window.texhubSearchableSelect?.apply(parentSelect);
                             const value = parentSelect?.value || '';
                             const currentFields = value ? (typeMap[value]?.fields || []) : [];
                             renderParentFields(parentFields, currentFields);
@@ -515,6 +516,7 @@
                             const parentSelect = block.querySelector('[data-parent-select]');
                             if (parentSelect && data.order_type_id !== undefined) {
                                 parentSelect.value = data.order_type_id ?? '';
+                                window.texhubSearchableSelect?.apply(parentSelect);
                             }
                             Object.entries(data).forEach(([field, value]) => {
                                 if (field === 'order_kind' || field === 'order_type_id') return;
