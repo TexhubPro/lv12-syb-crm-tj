@@ -1273,3 +1273,95 @@ if (!window.__texhubPreventDoubleSubmit) {
         });
     });
 }
+
+if (!window.__texhubSearchableSelect) {
+    window.__texhubSearchableSelect = true;
+
+    const searchableInputClass =
+        'mb-2 w-full rounded-xl border-2 border-transparent bg-gray-100 px-4 py-2 text-sm text-gray-900 placeholder:text-gray-500 hover:bg-gray-200 focus:border-blue-500 focus:outline-none dark:bg-white/5 dark:text-gray-100 dark:placeholder:text-gray-400';
+
+    const normalizeSearch = (value) => String(value ?? '').trim().toLowerCase();
+
+    const applySearchFilter = (select) => {
+        if (!select) return;
+        const input = select._searchableInput;
+        if (!input) return;
+        const query = normalizeSearch(input.value);
+        const options = Array.from(select.options || []);
+
+        options.forEach((option) => {
+            if (!option.value) {
+                option.hidden = false;
+                return;
+            }
+            const label = normalizeSearch(option.textContent || option.label || option.value);
+            const matches = !query || label.includes(query);
+            if (option.selected) {
+                option.hidden = option.disabled;
+                return;
+            }
+            option.hidden = option.disabled || !matches;
+        });
+    };
+
+    const bindSearchableSelect = (select) => {
+        if (!select || select.dataset.searchableBound === 'true') return;
+        const wrapper = select.parentElement;
+        if (!wrapper) return;
+        if (wrapper.querySelector('[data-searchable-input]')) return;
+
+        select.dataset.searchableBound = 'true';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = select.dataset.searchablePlaceholder || 'Поиск...';
+        input.className = select.dataset.searchableClass || searchableInputClass;
+        input.setAttribute('aria-label', input.placeholder);
+        input.dataset.searchableInput = 'true';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.disabled = select.disabled;
+
+        wrapper.insertBefore(input, select);
+        select._searchableInput = input;
+
+        const handle = () => applySearchFilter(select);
+        input.addEventListener('input', handle);
+        select.addEventListener('change', handle);
+        applySearchFilter(select);
+    };
+
+    const initSearchableSelects = (root = document) => {
+        root.querySelectorAll('select[data-searchable-select]').forEach(bindSearchableSelect);
+    };
+
+    const observeSearchableSelects = () => {
+        if (!document.body) return;
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (!(node instanceof HTMLElement)) return;
+                    if (node.matches('select[data-searchable-select]')) {
+                        bindSearchableSelect(node);
+                    }
+                    node.querySelectorAll?.('select[data-searchable-select]').forEach(bindSearchableSelect);
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            initSearchableSelects();
+            observeSearchableSelects();
+        }, { once: true });
+    } else {
+        initSearchableSelects();
+        observeSearchableSelects();
+    }
+
+    window.texhubSearchableSelect = {
+        apply: applySearchFilter,
+    };
+}
