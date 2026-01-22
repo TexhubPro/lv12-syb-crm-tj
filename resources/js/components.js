@@ -904,6 +904,9 @@ if (!window.__texhubSubOrders) {
                 if (areaInput) areaInput.value = area ? area.toFixed(2) : '';
             }
 
+            if (priceInput && isVisibleField(priceInput) && priceInput.value === '' && typePrice) {
+                priceInput.value = typePrice.toFixed(2);
+            }
             let price = isVisibleField(priceInput) ? toNumber(priceInput?.value) : 0;
             if (!price) price = typePrice;
 
