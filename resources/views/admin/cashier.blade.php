@@ -114,7 +114,7 @@
                                 <div data-field-key="parent_select">
                                     <input type="hidden" name="parent_orders[__pindex__][order_kind]" value="Родитель" />
                                     <x-select label="Родительский вид" name="parent_orders[__pindex__][order_type_id]"
-                                        data-parent-select data-searchable-select>
+                                        data-parent-select>
                                         <option value="">Выберите родителя</option>
                                         @foreach ($parentTypes as $type)
                                             <option value="{{ $type->id }}" data-unit="{{ $type->unit }}"
@@ -167,7 +167,7 @@
                                         @elseif ($field->key === 'cornice_type')
                                             <x-select label="{{ $field->name }}"
                                                 name="parent_orders[__pindex__][cornice_type_id]"
-                                                placeholder="Выберите тип" data-searchable-select>
+                                                placeholder="Выберите тип">
                                                 @foreach ($corniceTypes as $type)
                                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                                 @endforeach
@@ -175,7 +175,7 @@
                                         @elseif ($field->key === 'fabric_code')
                                             <x-select label="{{ $field->name }}"
                                                 name="parent_orders[__pindex__][fabric_code_id]"
-                                                placeholder="Выберите код" data-searchable-select>
+                                                placeholder="Выберите код">
                                                 @foreach ($fabricCodes as $code)
                                                     <option value="{{ $code->id }}">{{ $code->name }}</option>
                                                 @endforeach
@@ -183,7 +183,7 @@
                                         @elseif ($field->key === 'profile_color')
                                             <x-select label="{{ $field->name }}"
                                                 name="parent_orders[__pindex__][profile_color_id]"
-                                                placeholder="Выберите цвет" data-searchable-select>
+                                                placeholder="Выберите цвет">
                                                 @foreach ($profileColors as $color)
                                                     <option value="{{ $color->id }}">{{ $color->name }}</option>
                                                 @endforeach
@@ -235,7 +235,7 @@
                             <input type="hidden" name="sub_orders[__index__][order_kind]" value="Дочерний" />
                             <div data-field-key="order_type">
                                 <x-select label="Вид" name="sub_orders[__index__][order_type_id]" required="true"
-                                    data-sub-type data-searchable-select>
+                                    data-sub-type>
                                     <option value="">Выберите вид</option>
                                     @foreach ($orderTypes as $type)
                                         <option value="{{ $type->id }}" data-parent-id="{{ $type->parent_id }}"
@@ -248,7 +248,7 @@
                             </div>
                             <div data-field-key="cornice_type">
                                 <x-select label="Тип карниза" name="sub_orders[__index__][cornice_type_id]"
-                                    placeholder="Выберите тип" data-searchable-select>
+                                    placeholder="Выберите тип">
                                     @foreach ($corniceTypes as $type)
                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                                     @endforeach
@@ -256,7 +256,7 @@
                             </div>
                             <div data-field-key="fabric_code">
                                 <x-select label="Код ткани" name="sub_orders[__index__][fabric_code_id]"
-                                    placeholder="Выберите код" data-searchable-select>
+                                    placeholder="Выберите код">
                                     @foreach ($fabricCodes as $code)
                                         <option value="{{ $code->id }}">{{ $code->name }}</option>
                                     @endforeach
@@ -264,7 +264,7 @@
                             </div>
                             <div data-field-key="profile_color">
                                 <x-select label="Цвет профиля" name="sub_orders[__index__][profile_color_id]"
-                                    placeholder="Выберите цвет" data-searchable-select>
+                                    placeholder="Выберите цвет">
                                     @foreach ($profileColors as $color)
                                         <option value="{{ $color->id }}">{{ $color->name }}</option>
                                     @endforeach
@@ -427,7 +427,6 @@
                                     select.value = '';
                                 }
                             }
-                            window.texhubSearchableSelect?.apply(select);
                         };
 
                         const hydrateRow = (row, data) => {
