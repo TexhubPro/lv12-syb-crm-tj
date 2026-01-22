@@ -85,7 +85,7 @@
                 <x-input label="Название" name="name" required="true" placeholder="Например: Профильный" />
                 <div class="flex items-center justify-end gap-2">
                     <x-button variant="ghost" color="default" data-modal-close>Отмена</x-button>
-                    <x-button variant="solid" color="primary">Сохранить</x-button>
+                    <x-button type="submit" variant="solid" color="primary">Сохранить</x-button>
                 </div>
             </form>
         </div>
@@ -110,7 +110,7 @@
                 <x-input label="Название" name="name" required="true" data-modal-input="name" />
                 <div class="flex items-center justify-end gap-2">
                     <x-button variant="ghost" color="default" data-modal-close>Отмена</x-button>
-                    <x-button variant="solid" color="primary">Сохранить</x-button>
+                    <x-button type="submit" variant="solid" color="primary">Сохранить</x-button>
                 </div>
             </form>
         </div>
