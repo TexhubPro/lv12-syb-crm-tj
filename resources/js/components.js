@@ -1306,7 +1306,9 @@ if (!window.__texhubSearchableSelect) {
             item.className =
                 'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5';
             item.dataset.value = option.value;
-            item.textContent = option.textContent || option.label || option.value;
+            const labelText = option.textContent || option.label || option.value;
+            item.textContent = labelText;
+            item.dataset.search = normalizeSearch(`${labelText} ${option.value}`);
             const isSelected = String(option.value) === String(current);
             item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
             if (isSelected) {
@@ -1325,7 +1327,7 @@ if (!window.__texhubSearchableSelect) {
         const items = Array.from(menu.querySelectorAll('[data-value]'));
         let hasVisible = false;
         items.forEach((item) => {
-            const label = normalizeSearch(item.textContent || item.dataset.value);
+            const label = item.dataset.search || normalizeSearch(item.textContent || item.dataset.value);
             const matches = !query || label.includes(query);
             item.classList.toggle('hidden', !matches);
             if (matches) hasVisible = true;
@@ -1398,7 +1400,25 @@ if (!window.__texhubSearchableSelect) {
         buildMenu(select);
         syncInputFromSelect(select);
 
-        const handleInput = () => applySearchFilter(select);
+        const getVisibleItems = () =>
+            Array.from(menu.querySelectorAll('[data-value]')).filter((item) => !item.classList.contains('hidden'));
+
+        const highlightItem = (item) => {
+            menu.querySelectorAll('[data-active="true"]').forEach((el) => {
+                el.dataset.active = 'false';
+                el.classList.remove('bg-slate-100', 'dark:bg-white/10');
+            });
+            if (!item) return;
+            item.dataset.active = 'true';
+            item.classList.add('bg-slate-100', 'dark:bg-white/10');
+            item.scrollIntoView({ block: 'nearest' });
+        };
+
+        const handleInput = () => {
+            applySearchFilter(select);
+            const first = getVisibleItems()[0];
+            if (first) highlightItem(first);
+        };
         input.addEventListener('input', handleInput);
         input.addEventListener('focus', handleInput);
         input.addEventListener('click', handleInput);
@@ -1420,16 +1440,57 @@ if (!window.__texhubSearchableSelect) {
                 closeMenu(select);
                 const value = normalizeSearch(input.value);
                 const options = Array.from(select.options || []);
-                const match = options.find((option) => {
+                const exact = options.find((option) => {
                     if (!option.value) return false;
                     const label = normalizeSearch(option.textContent || option.label || option.value);
                     return label === value;
                 });
-                if (!match) {
-                    select.value = '';
-                    input.value = '';
+                if (exact) {
+                    select.value = exact.value;
+                    syncInputFromSelect(select);
+                    return;
                 }
+                const visible = getVisibleItems();
+                const first = visible[0];
+                if (first) {
+                    select.value = first.dataset.value || '';
+                    syncInputFromSelect(select);
+                    buildMenu(select);
+                    return;
+                }
+                select.value = '';
+                input.value = '';
             }, 150);
+        });
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                const visible = getVisibleItems();
+                if (!visible.length) return;
+                const current = menu.querySelector('[data-active="true"]');
+                let index = visible.indexOf(current);
+                if (event.key === 'ArrowDown') index = Math.min(index + 1, visible.length - 1);
+                if (event.key === 'ArrowUp') index = Math.max(index - 1, 0);
+                highlightItem(visible[index]);
+                openMenu(select);
+            }
+            if (event.key === 'Enter') {
+                const active = menu.querySelector('[data-active="true"]');
+                const target = active || getVisibleItems()[0];
+                if (target) {
+                    event.preventDefault();
+                    select.value = target.dataset.value || '';
+                    syncInputFromSelect(select);
+                    buildMenu(select);
+                    closeMenu(select);
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    select.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+            if (event.key === 'Escape') {
+                closeMenu(select);
+            }
         });
 
         document.addEventListener('click', (event) => {
