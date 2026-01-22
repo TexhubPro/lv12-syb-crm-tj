@@ -164,6 +164,38 @@
                                         @elseif ($field->key === 'total')
                                             <x-input label="{{ $field->name }}"
                                                 name="parent_orders[__pindex__][{{ $field->key }}]" data-parent-total />
+                                        @elseif ($field->key === 'cornice_type')
+                                            <x-select label="{{ $field->name }}"
+                                                name="parent_orders[__pindex__][cornice_type_id]"
+                                                placeholder="Выберите тип">
+                                                @foreach ($corniceTypes as $type)
+                                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                                @endforeach
+                                            </x-select>
+                                        @elseif ($field->key === 'fabric_code')
+                                            <x-select label="{{ $field->name }}"
+                                                name="parent_orders[__pindex__][fabric_code_id]"
+                                                placeholder="Выберите код">
+                                                @foreach ($fabricCodes as $code)
+                                                    <option value="{{ $code->id }}">{{ $code->name }}</option>
+                                                @endforeach
+                                            </x-select>
+                                        @elseif ($field->key === 'profile_color')
+                                            <x-select label="{{ $field->name }}"
+                                                name="parent_orders[__pindex__][profile_color_id]"
+                                                placeholder="Выберите цвет">
+                                                @foreach ($profileColors as $color)
+                                                    <option value="{{ $color->id }}">{{ $color->name }}</option>
+                                                @endforeach
+                                            </x-select>
+                                        @elseif ($field->key === 'control_type')
+                                            <x-select label="{{ $field->name }}"
+                                                name="parent_orders[__pindex__][control_type_id]"
+                                                placeholder="Выберите тип">
+                                                @foreach ($controlTypes as $controlType)
+                                                    <option value="{{ $controlType->id }}">{{ $controlType->name }}</option>
+                                                @endforeach
+                                            </x-select>
                                         @else
                                             <x-input label="{{ $field->name }}"
                                                 name="parent_orders[__pindex__][{{ $field->key }}]" />
