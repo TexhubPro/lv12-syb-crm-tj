@@ -16,7 +16,7 @@
                 Добавить тип
             </x-button>
         </div>
-
+        {{-- edrklhgtker --}}
         @if (session('status'))
             <x-alert variant="success" title="Готово">
                 {{ session('status') }}
