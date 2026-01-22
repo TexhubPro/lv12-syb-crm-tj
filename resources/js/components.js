@@ -1339,6 +1339,8 @@ if (!window.__texhubSearchableSelect) {
         }
     };
 
+    const normalizeDisplay = (value) => String(value ?? '').replace(/\s+/g, ' ').trim();
+
     const syncInputFromSelect = (select) => {
         const input = select?._searchableInput;
         if (!input) return;
@@ -1347,7 +1349,7 @@ if (!window.__texhubSearchableSelect) {
             input.value = '';
             return;
         }
-        input.value = option.textContent || option.label || option.value;
+        input.value = normalizeDisplay(option.textContent || option.label || option.value);
     };
 
     const bindSearchableSelect = (select) => {
@@ -1438,7 +1440,7 @@ if (!window.__texhubSearchableSelect) {
         input.addEventListener('blur', () => {
             setTimeout(() => {
                 closeMenu(select);
-                const value = normalizeSearch(input.value);
+                const value = normalizeSearch(normalizeDisplay(input.value));
                 const options = Array.from(select.options || []);
                 const exact = options.find((option) => {
                     if (!option.value) return false;
