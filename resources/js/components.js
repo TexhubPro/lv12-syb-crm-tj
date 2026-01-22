@@ -1273,3 +1273,209 @@ if (!window.__texhubPreventDoubleSubmit) {
         });
     });
 }
+
+if (!window.__texhubSearchableSelect) {
+    window.__texhubSearchableSelect = true;
+
+    const normalizeSearch = (value) => String(value ?? '').trim().toLowerCase();
+
+    const closeMenu = (select) => {
+        const menu = select?._searchableMenu;
+        if (!menu) return;
+        menu.classList.add('hidden');
+    };
+
+    const openMenu = (select) => {
+        const menu = select?._searchableMenu;
+        if (!menu) return;
+        menu.classList.remove('hidden');
+    };
+
+    const buildMenu = (select) => {
+        if (!select) return;
+        const menu = select._searchableMenu;
+        if (!menu) return;
+        menu.innerHTML = '';
+        const options = Array.from(select.options || []);
+        const current = select.value;
+        options.forEach((option) => {
+            if (!option.value) return;
+            if (option.disabled) return;
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className =
+                'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5';
+            item.dataset.value = option.value;
+            item.textContent = option.textContent || option.label || option.value;
+            const isSelected = String(option.value) === String(current);
+            item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            if (isSelected) {
+                item.classList.add('bg-slate-100', 'dark:bg-white/10');
+            }
+            menu.appendChild(item);
+        });
+    };
+
+    const applySearchFilter = (select) => {
+        if (!select) return;
+        const input = select._searchableInput;
+        const menu = select._searchableMenu;
+        if (!input || !menu) return;
+        const query = normalizeSearch(input.value);
+        const items = Array.from(menu.querySelectorAll('[data-value]'));
+        let hasVisible = false;
+        items.forEach((item) => {
+            const label = normalizeSearch(item.textContent || item.dataset.value);
+            const matches = !query || label.includes(query);
+            item.classList.toggle('hidden', !matches);
+            if (matches) hasVisible = true;
+        });
+        if (hasVisible) {
+            openMenu(select);
+        } else {
+            closeMenu(select);
+        }
+    };
+
+    const syncInputFromSelect = (select) => {
+        const input = select?._searchableInput;
+        if (!input) return;
+        const option = select.selectedOptions?.[0];
+        if (!option || !option.value) {
+            input.value = '';
+            return;
+        }
+        input.value = option.textContent || option.label || option.value;
+    };
+
+    const bindSearchableSelect = (select) => {
+        if (!select || select.dataset.searchableBound === 'true') return;
+        const wrapper = select.parentElement;
+        if (!wrapper) return;
+        if (wrapper.querySelector('[data-searchable-input]')) return;
+
+        select.dataset.searchableBound = 'true';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        const placeholderOption = Array.from(select.options || []).find((option) => !option.value && option.disabled);
+        input.placeholder =
+            select.dataset.searchablePlaceholder || placeholderOption?.textContent?.trim() || 'Выберите значение';
+        input.className = `${select.className} pr-12`;
+        input.setAttribute('aria-label', input.placeholder);
+        input.dataset.searchableInput = 'true';
+        input.autocomplete = 'off';
+        input.spellcheck = false;
+        input.disabled = select.disabled;
+
+        const menu = document.createElement('div');
+        menu.className =
+            'absolute left-0 right-0 z-10 mt-2 hidden max-h-56 overflow-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-lg dark:border-white/10 dark:bg-slate-950';
+        menu.dataset.searchableMenu = 'true';
+
+        const icon = document.createElement('span');
+        icon.className =
+            'pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400';
+        icon.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+
+        const originalId = select.id;
+        if (originalId) {
+            input.id = originalId;
+            select.id = `${originalId}--native`;
+            const label = wrapper.parentElement?.querySelector?.(`label[for="${originalId}"]`);
+            if (label) label.setAttribute('for', input.id);
+        }
+
+        select.classList.add('sr-only');
+        wrapper.appendChild(input);
+        wrapper.appendChild(icon);
+        wrapper.appendChild(menu);
+
+        select._searchableInput = input;
+        select._searchableMenu = menu;
+
+        buildMenu(select);
+        syncInputFromSelect(select);
+
+        const handleInput = () => applySearchFilter(select);
+        input.addEventListener('input', handleInput);
+        input.addEventListener('focus', handleInput);
+        input.addEventListener('click', handleInput);
+        select.addEventListener('change', () => syncInputFromSelect(select));
+
+        menu.addEventListener('click', (event) => {
+            const item = event.target.closest('[data-value]');
+            if (!item) return;
+            select.value = item.dataset.value || '';
+            syncInputFromSelect(select);
+            buildMenu(select);
+            closeMenu(select);
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            select.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+
+        input.addEventListener('blur', () => {
+            setTimeout(() => {
+                closeMenu(select);
+                const value = normalizeSearch(input.value);
+                const options = Array.from(select.options || []);
+                const match = options.find((option) => {
+                    if (!option.value) return false;
+                    const label = normalizeSearch(option.textContent || option.label || option.value);
+                    return label === value;
+                });
+                if (!match) {
+                    select.value = '';
+                    input.value = '';
+                }
+            }, 150);
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!wrapper.contains(event.target)) closeMenu(select);
+        });
+    };
+
+    const initSearchableSelects = (root = document) => {
+        root.querySelectorAll('select[data-searchable-select]').forEach(bindSearchableSelect);
+    };
+
+    const observeSearchableSelects = () => {
+        if (!document.body) return;
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (!(node instanceof HTMLElement)) return;
+                    if (node.matches('select[data-searchable-select]')) {
+                        bindSearchableSelect(node);
+                    }
+                    node.querySelectorAll?.('select[data-searchable-select]').forEach(bindSearchableSelect);
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                initSearchableSelects();
+                observeSearchableSelects();
+            },
+            { once: true },
+        );
+    } else {
+        initSearchableSelects();
+        observeSearchableSelects();
+    }
+
+    window.texhubSearchableSelect = {
+        apply: (select) => {
+            buildMenu(select);
+            applySearchFilter(select);
+            syncInputFromSelect(select);
+        },
+    };
+}
