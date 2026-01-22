@@ -1363,7 +1363,7 @@ if (!window.__texhubSearchableSelect) {
         const placeholderOption = Array.from(select.options || []).find((option) => !option.value && option.disabled);
         input.placeholder =
             select.dataset.searchablePlaceholder || placeholderOption?.textContent?.trim() || 'Выберите значение';
-        input.className = `${select.className} pr-12`;
+        input.className = `${select.className} pr-12 text-slate-900 placeholder:text-slate-400 dark:text-slate-100`;
         input.setAttribute('aria-label', input.placeholder);
         input.dataset.searchableInput = 'true';
         input.autocomplete = 'off';
