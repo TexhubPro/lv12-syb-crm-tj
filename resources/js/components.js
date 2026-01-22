@@ -826,7 +826,7 @@ if (!window.__texhubSubOrders) {
         const totalInput = row.querySelector('[data-sub-total]');
 
         const manualArea = row.dataset.manualArea === 'true';
-        const area = manualArea ? toNumber(areaInput?.value) : (width && height ? (width * height) / 10000 : 0);
+        const area = manualArea ? toNumber(areaInput?.value) : (width && height ? (width * height) : 0);
         if (areaInput && !manualArea) areaInput.value = area ? area.toFixed(2) : '';
 
         const price = toNumber(priceInput?.value);
@@ -837,7 +837,7 @@ if (!window.__texhubSubOrders) {
         if (unit) {
             let perItem = 1;
             if (unit === 'meter') {
-                perItem = width ? width / 100 : 0;
+                perItem = width ? width : 0;
             } else if (unit === 'square_meter') {
                 perItem = area;
             }
@@ -846,7 +846,7 @@ if (!window.__texhubSubOrders) {
             }
             amount = price * perItem * qty;
         } else {
-            amount = calcMode === 'width-price' ? (width / 100) * price * qty : price * qty;
+            amount = calcMode === 'width-price' ? width * price * qty : price * qty;
         }
         if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
         const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
@@ -900,7 +900,7 @@ if (!window.__texhubSubOrders) {
             let area = toNumber(areaInput?.value);
             const manualArea = areaInput?.dataset?.manual === 'true';
             if (!manualArea && width && height) {
-                area = (width * height) / 10000;
+                area = (width * height);
                 if (areaInput) areaInput.value = area ? area.toFixed(2) : '';
             }
 
@@ -912,7 +912,7 @@ if (!window.__texhubSubOrders) {
 
             let perItem = 1;
             if (unit === 'meter') {
-                perItem = width ? width / 100 : 0;
+                perItem = width ? width : 0;
             } else if (unit === 'square_meter') {
                 perItem = area;
             } else if (unit === 'piece') {
