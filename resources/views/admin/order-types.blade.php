@@ -226,7 +226,7 @@
                             </div>
                             <div class="mt-2 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-slate-950"
                                 data-field-picker-menu>
-                                <div class="max-h-60 overflow-auto p-2 flex gap-2" data-order-type-fields>
+                                <div class="max-h-60 overflow-auto p-2 grid gap-2" data-order-type-fields>
                                     @foreach ($fields as $field)
                                         <button type="button"
                                             class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
