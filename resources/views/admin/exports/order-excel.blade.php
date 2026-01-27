@@ -1,12 +1,12 @@
 <table>
     @php
-        $visibleFields = $subOrders
+        $summaryFields = $subOrders
             ->flatMap(function ($subOrder) {
                 return $subOrder->orderType?->fields?->pluck('key') ?? collect();
             })
             ->unique()
             ->values();
-        $visibleColumns = collect([
+        $summaryColumns = collect([
             'cornice_type',
             'fabric_code',
             'profile_color',
@@ -21,173 +21,220 @@
             'amount',
             'discount',
             'total',
-        ])->filter(fn($key) => $visibleFields->contains($key));
-        $columnCount = 2 + $visibleColumns->count();
+            'note',
+            'corsage',
+            'tape',
+            'sewing',
+            'installation',
+            'motor',
+            'tiebacks',
+        ])->filter(fn($key) => $summaryFields->contains($key));
+        $summaryColumnCount = 2 + $summaryColumns->count();
         $summaryKeys = ['area', 'amount', 'discount', 'total'];
-        $summaryVisible = $visibleColumns->filter(fn($key) => in_array($key, $summaryKeys, true));
-        $nonSummaryCount = 2 + $visibleColumns
+        $summaryVisible = $summaryColumns->filter(fn($key) => in_array($key, $summaryKeys, true));
+        $summaryNonSummaryCount = 2 + $summaryColumns
             ->reject(fn($key) => in_array($key, $summaryKeys, true))
             ->count();
     @endphp
     <tr>
-        <td colspan="{{ $columnCount }}">Заказ #{{ $order->id }} — Soyabon</td>
+        <td colspan="{{ $summaryColumnCount }}">Заказ #{{ $order->id }} — Soyabon</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Дата: {{ $order->created_at->format('d.m.Y H:i') }}</td>
+        <td colspan="{{ $summaryColumnCount }}">Дата: {{ $order->created_at->format('d.m.Y H:i') }}</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}"></td>
+        <td colspan="{{ $summaryColumnCount }}"></td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Клиент: {{ $order->client?->full_name ?? 'Не указан' }}</td>
+        <td colspan="{{ $summaryColumnCount }}">Клиент: {{ $order->client?->full_name ?? 'Не указан' }}</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Телефон: {{ $order->client?->phone ?? 'Без телефона' }}</td>
+        <td colspan="{{ $summaryColumnCount }}">Телефон: {{ $order->client?->phone ?? 'Без телефона' }}</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Адрес: {{ $order->client?->address ?? 'Адрес не указан' }}</td>
+        <td colspan="{{ $summaryColumnCount }}">Адрес: {{ $order->client?->address ?? 'Адрес не указан' }}</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}"></td>
+        <td colspan="{{ $summaryColumnCount }}"></td>
     </tr>
-    <tr>
-        <th>Группа</th>
-        <th>Вид</th>
-        @if ($visibleFields->contains('cornice_type'))
-            <th>Тип карниза</th>
-        @endif
-        @if ($visibleFields->contains('fabric_code'))
-            <th>Код ткани</th>
-        @endif
-        @if ($visibleFields->contains('profile_color'))
-            <th>Цвет профиля</th>
-        @endif
-        @if ($visibleFields->contains('control_type'))
-            <th>Тип управления</th>
-        @endif
-        @if ($visibleFields->contains('room'))
-            <th>Комната</th>
-        @endif
-        @if ($visibleFields->contains('division'))
-            <th>Разделения</th>
-        @endif
-        @if ($visibleFields->contains('width'))
-            <th>Ширина</th>
-        @endif
-        @if ($visibleFields->contains('height'))
-            <th>Высота</th>
-        @endif
-        @if ($visibleFields->contains('quantity'))
-            <th>Кол-во</th>
-        @endif
-        @if ($visibleFields->contains('area'))
-            <th>Площадь</th>
-        @endif
-        @if ($visibleFields->contains('price'))
-            <th>Цена</th>
-        @endif
-        @if ($visibleFields->contains('amount'))
-            <th>Сумма</th>
-        @endif
-        @if ($visibleFields->contains('discount'))
-            <th>Скидка</th>
-        @endif
-        @if ($visibleFields->contains('total'))
-            <th>Итого</th>
-        @endif
-        @if ($visibleFields->contains('note'))
-            <th>Примечания</th>
-        @endif
-        @if ($visibleFields->contains('corsage'))
-            <th>Карсаж</th>
-        @endif
-        @if ($visibleFields->contains('tape'))
-            <th>Лента</th>
-        @endif
-        @if ($visibleFields->contains('sewing'))
-            <th>Пошив</th>
-        @endif
-        @if ($visibleFields->contains('installation'))
-            <th>Монтаж</th>
-        @endif
-        @if ($visibleFields->contains('motor'))
-            <th>Мотор</th>
-        @endif
-        @if ($visibleFields->contains('tiebacks'))
-            <th>Прихваты</th>
-        @endif
-    </tr>
-    @foreach ($subOrders as $subOrder)
+    @php
+        $groupedSubOrders = $subOrders->groupBy(function ($subOrder) {
+            return $subOrder->orderType?->parent?->id ?? $subOrder->orderType?->id ?? 0;
+        });
+    @endphp
+    @foreach ($groupedSubOrders as $group)
+        @php
+            $visibleFields = $group
+                ->flatMap(function ($subOrder) {
+                    return $subOrder->orderType?->fields?->pluck('key') ?? collect();
+                })
+                ->unique()
+                ->values();
+            $visibleColumns = collect([
+                'cornice_type',
+                'fabric_code',
+                'profile_color',
+                'control_type',
+                'room',
+                'division',
+                'width',
+                'height',
+                'quantity',
+                'area',
+                'price',
+                'amount',
+                'discount',
+                'total',
+                'note',
+                'corsage',
+                'tape',
+                'sewing',
+                'installation',
+                'motor',
+                'tiebacks',
+            ])->filter(fn($key) => $visibleFields->contains($key));
+            $columnCount = 2 + $visibleColumns->count();
+        @endphp
         <tr>
-            <td>{{ $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '—' }}</td>
-            <td>{{ $subOrder->orderType?->name ?? '—' }}</td>
+            <th>Вид</th>
             @if ($visibleFields->contains('cornice_type'))
-                <td>{{ $subOrder->corniceType?->name ?? '—' }}</td>
+                <th>Тип карниза</th>
             @endif
             @if ($visibleFields->contains('fabric_code'))
-                <td>{{ $subOrder->fabricCode?->name ?? '—' }}</td>
+                <th>Код ткани</th>
             @endif
             @if ($visibleFields->contains('profile_color'))
-                <td>{{ $subOrder->profileColor?->name ?? '—' }}</td>
+                <th>Цвет профиля</th>
             @endif
             @if ($visibleFields->contains('control_type'))
-                <td>{{ $subOrder->controlType?->name ?? '—' }}</td>
+                <th>Тип управления</th>
             @endif
             @if ($visibleFields->contains('room'))
-                <td>{{ $subOrder->room ?? '—' }}</td>
+                <th>Комната</th>
             @endif
             @if ($visibleFields->contains('division'))
-                <td>{{ $subOrder->division ?? '—' }}</td>
+                <th>Разделения</th>
             @endif
             @if ($visibleFields->contains('width'))
-                <td>{{ $subOrder->width }} см</td>
+                <th>Ширина</th>
             @endif
             @if ($visibleFields->contains('height'))
-                <td>{{ $subOrder->height }} см</td>
+                <th>Высота</th>
             @endif
             @if ($visibleFields->contains('quantity'))
-                <td>{{ $subOrder->quantity }}</td>
+                <th>Кол-во</th>
             @endif
             @if ($visibleFields->contains('area'))
-                <td>{{ $subOrder->area }} м²</td>
+                <th>Площадь</th>
             @endif
             @if ($visibleFields->contains('price'))
-                <td>{{ $subOrder->price }} с</td>
+                <th>Цена</th>
             @endif
             @if ($visibleFields->contains('amount'))
-                <td>{{ $subOrder->amount }} с</td>
+                <th>Сумма</th>
             @endif
             @if ($visibleFields->contains('discount'))
-                <td>{{ $subOrder->discount }} с</td>
+                <th>Скидка</th>
             @endif
             @if ($visibleFields->contains('total'))
-                <td>{{ $subOrder->total }} с</td>
+                <th>Итого</th>
             @endif
             @if ($visibleFields->contains('note'))
-                <td>{{ $subOrder->note ?? '—' }}</td>
+                <th>Примечания</th>
             @endif
             @if ($visibleFields->contains('corsage'))
-                <td>{{ $subOrder->corsage ?? '—' }}</td>
+                <th>Карсаж</th>
             @endif
             @if ($visibleFields->contains('tape'))
-                <td>{{ $subOrder->tape ?? '—' }}</td>
+                <th>Лента</th>
             @endif
             @if ($visibleFields->contains('sewing'))
-                <td>{{ $subOrder->sewing ?? '—' }}</td>
+                <th>Пошив</th>
             @endif
             @if ($visibleFields->contains('installation'))
-                <td>{{ $subOrder->installation ?? '—' }}</td>
+                <th>Монтаж</th>
             @endif
             @if ($visibleFields->contains('motor'))
-                <td>{{ $subOrder->motor ?? '—' }}</td>
+                <th>Мотор</th>
             @endif
             @if ($visibleFields->contains('tiebacks'))
-                <td>{{ $subOrder->tiebacks ?? '—' }}</td>
+                <th>Прихваты</th>
             @endif
+        </tr>
+        @foreach ($group as $subOrder)
+            <tr>
+                <td>{{ $subOrder->orderType?->name ?? '—' }}</td>
+                @if ($visibleFields->contains('cornice_type'))
+                    <td>{{ $subOrder->corniceType?->name ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('fabric_code'))
+                    <td>{{ $subOrder->fabricCode?->name ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('profile_color'))
+                    <td>{{ $subOrder->profileColor?->name ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('control_type'))
+                    <td>{{ $subOrder->controlType?->name ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('room'))
+                    <td>{{ $subOrder->room ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('division'))
+                    <td>{{ $subOrder->division ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('width'))
+                    <td>{{ $subOrder->width }} см</td>
+                @endif
+                @if ($visibleFields->contains('height'))
+                    <td>{{ $subOrder->height }} см</td>
+                @endif
+                @if ($visibleFields->contains('quantity'))
+                    <td>{{ $subOrder->quantity }}</td>
+                @endif
+                @if ($visibleFields->contains('area'))
+                    <td>{{ $subOrder->area }} м²</td>
+                @endif
+                @if ($visibleFields->contains('price'))
+                    <td>{{ $subOrder->price }} с</td>
+                @endif
+                @if ($visibleFields->contains('amount'))
+                    <td>{{ $subOrder->amount }} с</td>
+                @endif
+                @if ($visibleFields->contains('discount'))
+                    <td>{{ $subOrder->discount }} с</td>
+                @endif
+                @if ($visibleFields->contains('total'))
+                    <td>{{ $subOrder->total }} с</td>
+                @endif
+                @if ($visibleFields->contains('note'))
+                    <td>{{ $subOrder->note ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('corsage'))
+                    <td>{{ $subOrder->corsage ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('tape'))
+                    <td>{{ $subOrder->tape ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('sewing'))
+                    <td>{{ $subOrder->sewing ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('installation'))
+                    <td>{{ $subOrder->installation ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('motor'))
+                    <td>{{ $subOrder->motor ?? '—' }}</td>
+                @endif
+                @if ($visibleFields->contains('tiebacks'))
+                    <td>{{ $subOrder->tiebacks ?? '—' }}</td>
+                @endif
+            </tr>
+        @endforeach
+        <tr>
+            <td colspan="{{ $summaryColumnCount }}"></td>
         </tr>
     @endforeach
     <tr>
-        <td colspan="{{ $nonSummaryCount }}"></td>
+        <td colspan="{{ $summaryNonSummaryCount }}"></td>
         @foreach ($summaryVisible as $summaryKey)
             @if ($summaryKey === 'area')
                 <td>{{ $subOrdersArea }} м²</td>
@@ -201,21 +248,21 @@
         @endforeach
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}"></td>
+        <td colspan="{{ $summaryColumnCount }}"></td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Оплаченная сумма: {{ $order->advance_amount }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Оплаченная сумма: {{ $order->advance_amount }} с</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Общая скидка: {{ $subOrdersDiscount }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Общая скидка: {{ $subOrdersDiscount }} с</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Остаток: {{ $order->balance_amount }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Остаток: {{ $order->balance_amount }} с</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Переделки: {{ $order->rework_amount }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Переделки: {{ $order->rework_amount }} с</td>
     </tr>
     <tr>
-        <td colspan="{{ $columnCount }}">Итого по заказу: {{ $order->grand_total }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Итого по заказу: {{ $order->grand_total }} с</td>
     </tr>
 </table>

@@ -1,19 +1,19 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Виды')
+@section('title', 'Создание вида')
 
 @section('content')
     <div class="grid gap-8">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="text-xs uppercase tracking-[0.4em] text-slate-500 dark:text-slate-500">Справочники</p>
-                <h1 class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">Виды</h1>
+                <h1 class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">Создание вида</h1>
                 <p class="mt-2 max-w-xl text-sm text-slate-500 dark:text-slate-400">
-                    Управляйте списком видов для подзаказов. Добавляйте новые позиции и обновляйте существующие.
+                    Заполните параметры для нового вида подзаказа.
                 </p>
             </div>
-            <x-button size="md" variant="solid" color="primary" href="{{ route('admin.order-types.create') }}">
-                Добавить вид
+            <x-button size="md" variant="faded" color="default" href="{{ route('admin.order-types.index') }}">
+                К списку
             </x-button>
         </div>
 
@@ -29,110 +29,35 @@
         @endif
 
         <div
-            class="overflow-hidden overflow-x-auto rounded-2xl border border-slate-200/70 bg-white/70 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-            <div
-                class="grid min-w-[720px] grid-cols-7 gap-4 border-b border-slate-200/70 px-4 py-3 text-[10px] uppercase tracking-[0.3em] text-slate-500 dark:border-white/10 sm:px-6 sm:py-4 sm:text-xs">
-                <span>Название</span>
-                <span>Тип вида</span>
-                <span>Родитель</span>
-                <span>Ед.</span>
-                <span>Мин.</span>
-                <span class="text-right">Цена</span>
-                <span class="text-right">Действия</span>
-            </div>
-            <div class="divide-y divide-slate-200/70 dark:divide-white/10">
-                @forelse ($orderTypes as $orderType)
-                    <div class="grid min-w-[720px] grid-cols-7 items-center gap-4 px-4 py-3 sm:px-6 sm:py-4">
-                        <div>
-                            <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ $orderType->name }}</p>
-                        </div>
-                        <div class="text-sm text-slate-700 dark:text-slate-200">
-                            {{ $orderType->parent_id ? 'Дочерний' : 'Родительский' }}
-                        </div>
-                        <div class="text-sm text-slate-700 dark:text-slate-200">
-                            {{ $orderType->parent?->name ?? '—' }}
-                        </div>
-                        <div class="text-sm text-slate-700 dark:text-slate-200">
-                            {{ $units[$orderType->unit] ?? ($orderType->unit ?? '—') }}
-                        </div>
-                        <div class="text-sm text-slate-700 dark:text-slate-200">
-                            {{ $orderType->min_qty !== null ? number_format($orderType->min_qty, 2, '.', ' ') : '—' }}
-                        </div>
-                        <div class="text-sm font-semibold text-right text-slate-900 dark:text-white">
-                            {{ $orderType->price !== null ? number_format($orderType->price, 2, '.', ' ') . ' с' : '—' }}
-                        </div>
-                        <div class="flex items-center justify-end gap-2">
-                            <x-button size="sm" variant="faded" color="default" icon-only="true"
-                                aria-label="Редактировать" data-modal-open="order-type-edit"
-                                data-modal-name="{{ $orderType->name }}" data-modal-parent-id="{{ $orderType->parent_id }}"
-                                data-modal-type-level="{{ $orderType->parent_id ? 'child' : 'parent' }}"
-                                data-modal-unit="{{ $orderType->unit }}" data-modal-min-qty="{{ $orderType->min_qty }}"
-                                data-modal-fields="{{ $orderType->fields->pluck('id')->implode(',') }}"
-                                data-modal-price="{{ $orderType->price }}"
-                                data-modal-action="{{ route('admin.order-types.update', $orderType) }}">
-                                <x-icon type="outline" icon="pencil" size="5"></x-icon>
-                            </x-button>
-                            <form method="POST" action="{{ route('admin.order-types.destroy', $orderType) }}">
-                                @csrf
-                                @method('DELETE')
-                                <x-button type="submit" size="sm" variant="ghost" color="danger" icon-only="true"
-                                    aria-label="Удалить">
-                                    <x-icon type="outline" icon="trash" size="5"></x-icon>
-                                </x-button>
-                            </form>
-                        </div>
-                    </div>
-                @empty
-                    <div class="px-6 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                        Пока нет видов. Добавьте первую запись.
-                    </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <div class="fixed inset-0 z-40 hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur"
-        data-modal="order-type-edit">
-        <div
-            class="w-full max-w-lg rounded-2xl border border-slate-200/70 bg-white p-6 shadow-xl dark:border-white/10 dark:bg-slate-950">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Редактирование</p>
-                    <h2 class="mt-2 text-xl font-semibold text-slate-900 dark:text-white">Изменить вид</h2>
-                </div>
-                <x-button icon-only="true" variant="ghost" color="default" data-modal-close>
-                    <x-icon type="outline" icon="x" size="5"></x-icon>
-                </x-button>
-            </div>
-            <form class="mt-6 grid gap-4" method="POST" data-modal-form data-order-type-form>
+            class="rounded-2xl border border-slate-200/70 bg-white/70 p-6 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+            <form method="POST" action="{{ route('admin.order-types.store') }}" data-order-type-form>
                 @csrf
-                @method('PUT')
-                <div class="mt-6 grid gap-4 max-h-[70vh] overflow-hidden overflow-y-scroll">
-                    <x-input label="Название" name="name" required="true" data-modal-input="name" />
-                    <x-select label="Тип вида" name="type_level" required="true" data-modal-input="typeLevel"
-                        data-order-type-level>
-                        <option value="parent">Родительский вид</option>
+                <div class="grid gap-4 ">
+                    <x-input label="Название" name="name" required="true" placeholder="Например: Рулонные" />
+                    <x-select label="Тип вида" name="type_level" required="true" data-order-type-level>
+                        <option value="parent" selected>Родительский вид</option>
                         <option value="child">Дочерний вид</option>
                     </x-select>
                     <div data-order-type-parent>
                         <x-select label="Родитель" name="parent_id" placeholder="Выберите родителя"
-                            data-modal-input="parentId" data-order-type-parent-select>
+                            data-order-type-parent-select>
                             @foreach ($parents as $parent)
                                 <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                             @endforeach
                         </x-select>
                     </div>
-                    <x-select label="Единица измерения" name="unit" required="true" data-modal-input="unit">
+                    <x-select label="Единица измерения" name="unit" required="true">
                         @foreach ($units as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
+                            <option value="{{ $value }}" @selected($value === 'piece')>{{ $label }}</option>
                         @endforeach
                     </x-select>
-                    <x-input label="Минимум" name="min_qty" type="number" min="0.01" step="0.01"
-                        required="true" data-modal-input="minQty" />
-                    <x-input label="Цена" name="price" type="number" min="0" step="0.01"
-                        required="true" data-modal-input="price" />
+                    <x-input label="Минимум" name="min_qty" type="number" min="0.01" step="0.01" required="true"
+                        value="1" placeholder="Например: 1" />
+                    <x-input label="Цена" name="price" type="number" min="0" step="0.01" required="true"
+                        value="0" placeholder="Например: 1200" />
                     <div class="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5"
-                        data-field-picker data-field-picker-name="fields_order">
+                        data-field-picker data-field-picker-name="fields_order"
+                        data-field-picker-defaults="quantity,width,room,price,amount,discount,total,note">
                         <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Поля</p>
                         <div class="mt-3">
                             <div class="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5"
@@ -146,7 +71,7 @@
                             </div>
                             <div class="mt-2 hidden overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-white/10 dark:bg-slate-950"
                                 data-field-picker-menu>
-                                <div class="max-h-60 overflow-auto p-2 grid gap-2" data-order-type-fields>
+                                <div class="max-h-60 overflow-auto p-2">
                                     @foreach ($fields as $field)
                                         <button type="button"
                                             class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5"
@@ -164,9 +89,71 @@
                             <div data-field-picker-inputs></div>
                         </div>
                     </div>
+
+                    @php
+                        $fabricCodes = old('fabric_codes', []);
+                    @endphp
+                    <div class="rounded-2xl border border-slate-200/70 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5"
+                        data-fabric-codes>
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-500">Коды ткани</p>
+                                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                                    Добавьте коды ткани, чтобы создать отдельные виды с новой ценой.
+                                </p>
+                            </div>
+                            <x-button type="button" size="sm" variant="faded" color="default" data-fabric-codes-add>
+                                Добавить код ткани
+                            </x-button>
+                        </div>
+
+                        <div class="mt-4 grid gap-3" data-fabric-codes-list>
+                            @foreach ($fabricCodes as $index => $code)
+                                <div class="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5"
+                                    data-fabric-codes-row>
+                                    <div class="min-w-[220px] flex-1">
+                                        <x-input label="Код ткани" name="fabric_codes[{{ $index }}][name]"
+                                            placeholder="Например: 66" value="{{ $code['name'] ?? '' }}"
+                                            data-fabric-field="name" />
+                                    </div>
+                                    <div class="min-w-[180px]">
+                                        <x-input label="Цена кода" name="fabric_codes[{{ $index }}][price]"
+                                            type="number" min="0" step="0.01" placeholder="Например: 30"
+                                            value="{{ $code['price'] ?? '' }}" data-fabric-field="price" />
+                                    </div>
+                                    <x-button type="button" size="sm" variant="ghost" color="danger"
+                                        data-fabric-codes-remove>
+                                        Удалить
+                                    </x-button>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <template data-fabric-codes-template>
+                            <div class="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200/70 bg-white/70 p-4 shadow-sm shadow-slate-900/5 dark:border-white/10 dark:bg-white/5"
+                                data-fabric-codes-row>
+                                <div class="min-w-[220px] flex-1">
+                                    <x-input label="Код ткани" name="fabric_codes[0][name]" placeholder="Например: 66"
+                                        data-fabric-field="name" disabled="true" />
+                                </div>
+                                <div class="min-w-[180px]">
+                                    <x-input label="Цена кода" name="fabric_codes[0][price]" type="number"
+                                        min="0" step="0.01" placeholder="Например: 30"
+                                        data-fabric-field="price" disabled="true" />
+                                </div>
+                                <x-button type="button" size="sm" variant="ghost" color="danger"
+                                    data-fabric-codes-remove>
+                                    Удалить
+                                </x-button>
+                            </div>
+                        </template>
+                    </div>
                 </div>
-                <div class="flex items-center justify-end gap-2">
-                    <x-button variant="ghost" color="default" data-modal-close>Отмена</x-button>
+
+                <div class="mt-5 flex items-center justify-end gap-2">
+                    <x-button variant="ghost" color="default" href="{{ route('admin.order-types.index') }}">
+                        Отмена
+                    </x-button>
                     <x-button type="submit" variant="solid" color="primary">Сохранить</x-button>
                 </div>
             </form>
@@ -332,19 +319,19 @@
                         .map((value) => value.trim())
                         .filter(Boolean);
                     if (defaults.length) {
-                    const defaultIds = defaults
-                        .map((value) => {
-                            const match = options.find((option) => {
-                                const optionId = option.dataset.fieldPickerId || '';
-                                const optionKey = option.dataset.fieldPickerKey || '';
-                                return optionKey === value || optionId === value;
-                            });
-                            return match?.dataset.fieldPickerId || '';
-                        })
-                        .filter(Boolean);
-                    setSelected(defaultIds);
+                        const defaultIds = defaults
+                            .map((value) => {
+                                const match = options.find((option) => {
+                                    const optionId = option.dataset.fieldPickerId || '';
+                                    const optionKey = option.dataset.fieldPickerKey || '';
+                                    return optionKey === value || optionId === value;
+                                });
+                                return match?.dataset.fieldPickerId || '';
+                            })
+                            .filter(Boolean);
+                        setSelected(defaultIds);
+                    }
                 }
-            }
 
                 if (tags && !tags.dataset.dragReady) {
                     tags.dataset.dragReady = 'true';
@@ -390,23 +377,46 @@
                 });
             });
 
-            document.addEventListener('click', (event) => {
-                const trigger = event.target.closest('[data-modal-open]');
-                if (!trigger) return;
-                const selected = (trigger.dataset.modalFields || '')
-                    .split(',')
-                    .map((value) => value.trim())
-                    .filter(Boolean);
-                setTimeout(() => {
-                    document.querySelectorAll('[data-order-type-form]').forEach((form) => {
-                        updateForm(form);
-                        form.querySelectorAll('[data-field-picker]').forEach((picker) => {
-                            const api = initFieldPicker(picker);
-                            api?.setSelected(selected);
-                        });
+            const fabricRoot = document.querySelector('[data-fabric-codes]');
+            if (fabricRoot) {
+                const list = fabricRoot.querySelector('[data-fabric-codes-list]');
+                const template = fabricRoot.querySelector('[data-fabric-codes-template]');
+                const addButton = fabricRoot.querySelector('[data-fabric-codes-add]');
+                let index = list ? list.querySelectorAll('[data-fabric-codes-row]').length : 0;
+
+                const bindRemove = (row) => {
+                    const removeButton = row.querySelector('[data-fabric-codes-remove]');
+                    removeButton?.addEventListener('click', () => row.remove());
+                };
+
+                const addRow = (values = {}) => {
+                    if (!template || !list) return;
+                    const fragment = template.content.cloneNode(true);
+                    const row = fragment.querySelector('[data-fabric-codes-row]');
+                    if (!row) return;
+                    row.querySelectorAll('input[data-fabric-field]').forEach((input) => {
+                        const field = input.dataset.fabricField;
+                        const oldId = input.id;
+                        const newId = `fabric-code-${index}-${field}`;
+                        input.name = `fabric_codes[${index}][${field}]`;
+                        input.id = newId;
+                        input.disabled = false;
+                        if (values[field] !== undefined) {
+                            input.value = values[field];
+                        }
+                        if (oldId) {
+                            const label = row.querySelector(`label[for="${oldId}"]`);
+                            if (label) label.setAttribute('for', newId);
+                        }
                     });
-                }, 0);
-            });
+                    bindRemove(row);
+                    list.appendChild(row);
+                    index += 1;
+                };
+
+                addButton?.addEventListener('click', () => addRow());
+                list?.querySelectorAll('[data-fabric-codes-row]').forEach((row) => bindRemove(row));
+            }
         });
     </script>
 @endsection

@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin'
         ]);
 
-        $this->call(OrderTypeFieldSeeder::class);
+        // $this->call(OrderTypeFieldSeeder::class);
         // $this->call(OrderTypeSeeder::class);
     }
 }

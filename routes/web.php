@@ -30,6 +30,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
 
     Route::get('/admin/order-types', [OrderTypeController::class, 'index'])->name('admin.order-types.index');
+    Route::get('/admin/order-types/create', [OrderTypeController::class, 'create'])->name('admin.order-types.create');
     Route::post('/admin/order-types', [OrderTypeController::class, 'store'])->name('admin.order-types.store');
     Route::put('/admin/order-types/{orderType}', [OrderTypeController::class, 'update'])->name('admin.order-types.update');
     Route::delete('/admin/order-types/{orderType}', [OrderTypeController::class, 'destroy'])->name('admin.order-types.destroy');
