@@ -617,11 +617,12 @@
                     {{-- <x-input label="Мотор" name="motor" value="{{ old('motor') }}" placeholder="Somfy" /> --}}
                     <x-input label="Сумма заказа" name="order_total" value="{{ old('order_total') }}" placeholder="0"
                         data-order-total />
-                    <div class="grid gap-1">
-                        <x-input label="Сумма скидки" name="order_total_discounted"
-                            value="{{ old('order_total_discounted') }}" placeholder="0" data-order-discounted />
-                        <p class="text-xs text-slate-500">Скидка: <span data-discount-percent>0</span>%</p>
-                    </div>
+                    <x-input label="Сумма скидки" name="order_total_discounted"
+                        value="{{ old('order_total_discounted') }}" placeholder="0" data-order-discounted>
+                        <x-slot:endContent>
+                            <span class="text-xs text-slate-500"><span data-discount-percent>0</span>%</span>
+                        </x-slot:endContent>
+                    </x-input>
                     <x-input label="Аванс" name="advance_amount" value="{{ old('advance_amount') }}" placeholder="0"
                         data-order-advance />
                     <x-input label="Остаток" name="balance_amount" value="{{ old('balance_amount') }}" placeholder="0"
