@@ -52,17 +52,6 @@
                     <p class="mt-1 text-xs text-slate-400">с учетом скидок</p>
                 </div>
                 <div
-                    class="rounded-2xl border border-rose-200/70 bg-rose-50/70 p-4 shadow-sm shadow-slate-900/5 dark:border-rose-500/20 dark:bg-rose-500/10 dark:shadow-none">
-                    <div class="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-rose-600">
-                        <x-icon type="outline" icon="cash-minus" size="4"></x-icon>
-                        Переделки
-                    </div>
-                    <p class="mt-3 text-2xl font-semibold text-rose-700 dark:text-rose-200">
-                        {{ number_format($order->rework_amount, 2, '.', ' ') }}
-                    </p>
-                    <p class="mt-1 text-xs text-rose-500/80">корректировки</p>
-                </div>
-                <div
                     class="rounded-2xl border border-emerald-200/70 bg-emerald-50/70 p-4 shadow-sm shadow-slate-900/5 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:shadow-none">
                     <div class="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-emerald-600">
                         <x-icon type="outline" icon="cash" size="4"></x-icon>

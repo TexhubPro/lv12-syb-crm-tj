@@ -144,6 +144,32 @@
             font-weight: 700;
         }
 
+        .group-title {
+            margin-top: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #111827;
+        }
+
+        .group-summary {
+            width: 34%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+
+        .group-summary td {
+            border: 1px solid #e5e7eb;
+            padding: 3px 4px;
+        }
+
+        .group-summary td.label {
+            text-transform: none;
+            font-size: 9px;
+        }
+
         .signature {
             margin-top: 8px;
             display: flex;
@@ -193,7 +219,16 @@
                     })
                     ->unique()
                     ->values();
+                $groupTitle = $group->first()?->orderType?->parent?->name ?? $group->first()?->orderType?->name ?? '—';
+                $groupAmount = $group->sum('amount');
+                $groupDiscount = $group->sum(function ($subOrder) {
+                    $amount = (float) ($subOrder->amount ?? 0);
+                    $total = (float) ($subOrder->total ?? 0);
+                    return max(0, $amount - $total);
+                });
+                $groupTotal = $group->sum('total');
             @endphp
+            <div class="group-title">Группа: {{ $groupTitle }}</div>
             <table class="table table-block">
                 <thead>
                     <tr>
@@ -334,11 +369,25 @@
                     @endforeach
                 </tbody>
             </table>
+            <table class="group-summary">
+                <tr>
+                    <td class="label">Подытог</td>
+                    <td class="right">{{ number_format($groupAmount, 2, '.', ' ') }} с</td>
+                </tr>
+                <tr>
+                    <td class="label">Скидка</td>
+                    <td class="right">{{ number_format($groupDiscount, 2, '.', ' ') }} с</td>
+                </tr>
+                <tr>
+                    <td class="label">Итого</td>
+                    <td class="right">{{ number_format($groupTotal, 2, '.', ' ') }} с</td>
+                </tr>
+            </table>
         @endforeach
 
         <table class="summary">
             <tr>
-                <td class="label">Сумма</td>
+                <td class="label">Подытог</td>
                 <td class="right">{{ number_format($subOrdersAmount, 2, '.', ' ') }} с</td>
             </tr>
             <tr>
@@ -346,8 +395,12 @@
                 <td class="right">{{ number_format($subOrdersDiscount, 2, '.', ' ') }} с</td>
             </tr>
             <tr>
-                <td class="label">Переделки</td>
-                <td class="right">{{ number_format($order->rework_amount, 2, '.', ' ') }} с</td>
+                <td class="label">Аванс</td>
+                <td class="right">{{ number_format($order->advance_amount, 2, '.', ' ') }} с</td>
+            </tr>
+            <tr>
+                <td class="label">Остаток</td>
+                <td class="right">{{ number_format($order->balance_amount, 2, '.', ' ') }} с</td>
             </tr>
             <tr class="total">
                 <td class="label">Итого</td>

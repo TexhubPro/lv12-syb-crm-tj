@@ -812,7 +812,7 @@ if (!window.__texhubSubOrders) {
     const ensureQtyDefault = (row) => {
         const qtyInput = row.querySelector('[data-sub-qty]');
         if (!qtyInput) return;
-        if (!qtyInput.value) qtyInput.value = '1';
+        if (!qtyInput.value && document.activeElement !== qtyInput) qtyInput.value = '1';
     };
 
     const recalcRow = (row) => {
@@ -893,8 +893,11 @@ if (!window.__texhubSubOrders) {
             const width = toNumber(widthInput?.value);
             const height = toNumber(heightInput?.value);
             let qty = toNumber(qtyInput?.value);
-            if (!qty && qtyInput && isVisibleField(qtyInput)) {
-                qtyInput.value = '1';
+            const qtyFocused = qtyInput && document.activeElement === qtyInput;
+            if (!qty) {
+                if (qtyInput && isVisibleField(qtyInput) && !qtyFocused) {
+                    qtyInput.value = '1';
+                }
                 qty = 1;
             }
             let area = toNumber(areaInput?.value);
@@ -915,13 +918,11 @@ if (!window.__texhubSubOrders) {
                 perItem = width ? width : 0;
             } else if (unit === 'square_meter') {
                 perItem = area;
-            } else if (unit === 'piece') {
-                perItem = qty;
             }
             if ((unit === 'meter' || unit === 'square_meter') && minQty > 0 && perItem > 0) {
                 perItem = Math.max(perItem, minQty);
             }
-            const amount = price * perItem;
+            const amount = price * perItem * qty;
             if (amountInput) amountInput.value = amount ? amount.toFixed(2) : '';
             const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
             const discountValue = amount * (discountPercent / 100);

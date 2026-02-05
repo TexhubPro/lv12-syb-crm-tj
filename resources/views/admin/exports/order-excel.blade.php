@@ -62,44 +62,55 @@
             return $subOrder->orderType?->parent?->id ?? $subOrder->orderType?->id ?? 0;
         });
     @endphp
-    @foreach ($groupedSubOrders as $group)
-        @php
-            $visibleFields = $group
-                ->flatMap(function ($subOrder) {
-                    return $subOrder->orderType?->fields?->pluck('key') ?? collect();
-                })
-                ->unique()
-                ->values();
-            $visibleColumns = collect([
-                'cornice_type',
-                'fabric_code',
-                'profile_color',
-                'control_type',
-                'room',
-                'division',
-                'width',
-                'height',
-                'quantity',
-                'area',
-                'price',
-                'amount',
-                'discount',
-                'total',
-                'note',
-                'corsage',
-                'tape',
-                'sewing',
-                'installation',
-                'motor',
-                'tiebacks',
-            ])->filter(fn($key) => $visibleFields->contains($key));
-            $columnCount = 2 + $visibleColumns->count();
-        @endphp
-        <tr>
-            <th>Вид</th>
-            @if ($visibleFields->contains('cornice_type'))
-                <th>Тип карниза</th>
-            @endif
+        @foreach ($groupedSubOrders as $group)
+            @php
+                $visibleFields = $group
+                    ->flatMap(function ($subOrder) {
+                        return $subOrder->orderType?->fields?->pluck('key') ?? collect();
+                    })
+                    ->unique()
+                    ->values();
+                $visibleColumns = collect([
+                    'cornice_type',
+                    'fabric_code',
+                    'profile_color',
+                    'control_type',
+                    'room',
+                    'division',
+                    'width',
+                    'height',
+                    'quantity',
+                    'area',
+                    'price',
+                    'amount',
+                    'discount',
+                    'total',
+                    'note',
+                    'corsage',
+                    'tape',
+                    'sewing',
+                    'installation',
+                    'motor',
+                    'tiebacks',
+                ])->filter(fn($key) => $visibleFields->contains($key));
+                $columnCount = 2 + $visibleColumns->count();
+                $groupTitle = $group->first()?->orderType?->parent?->name ?? $group->first()?->orderType?->name ?? '—';
+                $groupAmount = $group->sum('amount');
+                $groupDiscount = $group->sum(function ($subOrder) {
+                    $amount = (float) ($subOrder->amount ?? 0);
+                    $total = (float) ($subOrder->total ?? 0);
+                    return max(0, $amount - $total);
+                });
+                $groupTotal = $group->sum('total');
+            @endphp
+            <tr>
+                <td colspan="{{ $columnCount }}">Группа: {{ $groupTitle }}</td>
+            </tr>
+            <tr>
+                <th>Вид</th>
+                @if ($visibleFields->contains('cornice_type'))
+                    <th>Тип карниза</th>
+                @endif
             @if ($visibleFields->contains('fabric_code'))
                 <th>Код ткани</th>
             @endif
@@ -230,7 +241,19 @@
             </tr>
         @endforeach
         <tr>
-            <td colspan="{{ $summaryColumnCount }}"></td>
+            <td colspan="{{ $columnCount - 1 }}">Подытог</td>
+            <td>{{ $groupAmount }} с</td>
+        </tr>
+        <tr>
+            <td colspan="{{ $columnCount - 1 }}">Скидка</td>
+            <td>{{ $groupDiscount }} с</td>
+        </tr>
+        <tr>
+            <td colspan="{{ $columnCount - 1 }}">Итого</td>
+            <td>{{ $groupTotal }} с</td>
+        </tr>
+        <tr>
+            <td colspan="{{ $columnCount }}"></td>
         </tr>
     @endforeach
     <tr>
@@ -251,18 +274,18 @@
         <td colspan="{{ $summaryColumnCount }}"></td>
     </tr>
     <tr>
-        <td colspan="{{ $summaryColumnCount }}">Оплаченная сумма: {{ $order->advance_amount }} с</td>
+        <td colspan="{{ $summaryColumnCount }}">Подытог: {{ $subOrdersAmount }} с</td>
     </tr>
     <tr>
         <td colspan="{{ $summaryColumnCount }}">Общая скидка: {{ $subOrdersDiscount }} с</td>
     </tr>
     <tr>
-        <td colspan="{{ $summaryColumnCount }}">Остаток: {{ $order->balance_amount }} с</td>
-    </tr>
-    <tr>
-        <td colspan="{{ $summaryColumnCount }}">Переделки: {{ $order->rework_amount }} с</td>
-    </tr>
-    <tr>
         <td colspan="{{ $summaryColumnCount }}">Итого по заказу: {{ $order->grand_total }} с</td>
+    </tr>
+    <tr>
+        <td colspan="{{ $summaryColumnCount }}">Аванс: {{ $order->advance_amount }} с</td>
+    </tr>
+    <tr>
+        <td colspan="{{ $summaryColumnCount }}">Остаток: {{ $order->balance_amount }} с</td>
     </tr>
 </table>

@@ -623,8 +623,6 @@
                         data-order-advance />
                     <x-input label="Остаток" name="balance_amount" value="{{ old('balance_amount') }}" placeholder="0"
                         data-order-balance />
-                    <x-input label="Переделки" name="rework_amount" value="{{ old('rework_amount') }}" placeholder="0"
-                        data-order-rework />
                     <x-input label="Итого" name="grand_total" value="{{ old('grand_total') }}" placeholder="0"
                         data-order-grand />
                 </div>
