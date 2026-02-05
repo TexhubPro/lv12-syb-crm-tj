@@ -35,6 +35,11 @@
         $summaryNonSummaryCount = 2 + $summaryColumns
             ->reject(fn($key) => in_array($key, $summaryKeys, true))
             ->count();
+        $subOrdersAreaAdjusted = $subOrders->sum(function ($subOrder) {
+            $area = (float) ($subOrder->area ?? 0);
+            $qty = (float) ($subOrder->quantity ?? 1);
+            return $area * max(1, $qty);
+        });
     @endphp
     <tr>
         <td colspan="{{ $summaryColumnCount }}">Заказ #{{ $order->id }} — Soyabon</td>
@@ -203,7 +208,7 @@
                     <td>{{ $subOrder->quantity }}</td>
                 @endif
                 @if ($visibleFields->contains('area'))
-                    <td>{{ $subOrder->area }} м²</td>
+                    <td>{{ ($subOrder->area ?? 0) * max(1, $subOrder->quantity ?? 1) }} м²</td>
                 @endif
                 @if ($visibleFields->contains('price'))
                     <td>{{ $subOrder->price }} с</td>
@@ -260,7 +265,7 @@
         <td colspan="{{ $summaryNonSummaryCount }}"></td>
         @foreach ($summaryVisible as $summaryKey)
             @if ($summaryKey === 'area')
-                <td>{{ $subOrdersArea }} м²</td>
+                <td>{{ $subOrdersAreaAdjusted }} м²</td>
             @elseif ($summaryKey === 'amount')
                 <td>{{ $subOrdersAmount }} с</td>
             @elseif ($summaryKey === 'discount')

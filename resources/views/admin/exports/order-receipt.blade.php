@@ -329,9 +329,11 @@
                             @if ($visibleFields->contains('quantity'))
                                 <td class="right">{{ $subOrder->quantity }}</td>
                             @endif
-                            @if ($visibleFields->contains('area'))
-                                <td class="right">{{ number_format($subOrder->area, 2, '.', ' ') }}</td>
-                            @endif
+                        @if ($visibleFields->contains('area'))
+                            <td class="right">
+                                {{ number_format(($subOrder->area ?? 0) * max(1, $subOrder->quantity ?? 1), 2, '.', ' ') }}
+                            </td>
+                        @endif
                             @if ($visibleFields->contains('price'))
                                 <td class="right">{{ number_format($subOrder->price, 2, '.', ' ') }} с</td>
                             @endif

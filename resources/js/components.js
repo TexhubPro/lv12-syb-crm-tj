@@ -819,6 +819,7 @@ if (!window.__texhubSubOrders) {
         const width = toNumber(row.querySelector('[data-sub-width]')?.value);
         const height = toNumber(row.querySelector('[data-sub-height]')?.value);
         const qty = toNumber(row.querySelector('[data-sub-qty]')?.value);
+        const qtyValue = qty || 1;
         const areaInput = row.querySelector('[data-sub-area]');
         const priceInput = row.querySelector('[data-sub-price]');
         const amountInput = row.querySelector('[data-sub-amount]');
@@ -826,8 +827,9 @@ if (!window.__texhubSubOrders) {
         const totalInput = row.querySelector('[data-sub-total]');
 
         const manualArea = row.dataset.manualArea === 'true';
-        const area = manualArea ? toNumber(areaInput?.value) : (width && height ? (width * height) : 0);
-        if (areaInput && !manualArea) areaInput.value = area ? area.toFixed(2) : '';
+        const baseArea = manualArea ? toNumber(areaInput?.value) : (width && height ? (width * height) : 0);
+        const totalArea = baseArea * qtyValue;
+        if (areaInput && !manualArea) areaInput.value = totalArea ? totalArea.toFixed(2) : '';
 
         const price = toNumber(priceInput?.value);
         const { unit, minQty } = getTypeMeta(row);
@@ -839,7 +841,7 @@ if (!window.__texhubSubOrders) {
             if (unit === 'meter') {
                 perItem = width ? width : 0;
             } else if (unit === 'square_meter') {
-                perItem = area;
+                perItem = baseArea;
             }
             if (minQty > 0 && perItem > 0) {
                 perItem = Math.max(perItem, minQty);
@@ -868,7 +870,12 @@ if (!window.__texhubSubOrders) {
             const discountPercent = isVisibleField(discountInput) ? toNumber(discountInput?.value) : 0;
             const discountValue = amount * (discountPercent / 100);
             const total = amount - discountValue;
-            sumArea += toNumber(row.querySelector('[data-sub-area]')?.value);
+            const qtyValue = toNumber(row.querySelector('[data-sub-qty]')?.value) || 1;
+            const areaInput = row.querySelector('[data-sub-area]');
+            const manualArea = row.dataset.manualArea === 'true';
+            const baseArea = toNumber(areaInput?.value);
+            const totalArea = manualArea ? baseArea * qtyValue : baseArea;
+            sumArea += totalArea;
             sumAmount += amount;
             sumDiscount += discountValue;
             sumTotal += total;
@@ -902,9 +909,11 @@ if (!window.__texhubSubOrders) {
             }
             let area = toNumber(areaInput?.value);
             const manualArea = areaInput?.dataset?.manual === 'true';
+            const qtyValue = qty || 1;
             if (!manualArea && width && height) {
                 area = (width * height);
-                if (areaInput) areaInput.value = area ? area.toFixed(2) : '';
+                const totalArea = area * qtyValue;
+                if (areaInput) areaInput.value = totalArea ? totalArea.toFixed(2) : '';
             }
 
             if (priceInput && isVisibleField(priceInput) && priceInput.value === '' && typePrice) {
@@ -929,7 +938,7 @@ if (!window.__texhubSubOrders) {
             const total = amount - discountValue;
             if (totalInput) totalInput.value = total ? total.toFixed(2) : '';
 
-            sumArea += area;
+            sumArea += area * qtyValue;
             sumAmount += amount;
             sumDiscount += discountValue;
             sumTotal += total;
