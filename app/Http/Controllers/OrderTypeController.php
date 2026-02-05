@@ -37,6 +37,10 @@ class OrderTypeController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'parent_id' => $request->input('parent_id') ?: null,
+        ]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:order_types,name'],
             'type_level' => ['required', Rule::in(['parent', 'child'])],
@@ -145,6 +149,10 @@ class OrderTypeController extends Controller
 
     public function update(Request $request, OrderType $orderType)
     {
+        $request->merge([
+            'parent_id' => $request->input('parent_id') ?: null,
+        ]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('order_types', 'name')->ignore($orderType->id)],
             'type_level' => ['required', Rule::in(['parent', 'child'])],
