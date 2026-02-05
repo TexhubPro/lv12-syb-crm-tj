@@ -34,18 +34,10 @@
                 @csrf
                 <div class="grid gap-4 ">
                     <x-input label="Название" name="name" required="true" placeholder="Например: Рулонные" />
-                    <x-select label="Тип вида" name="type_level" required="true" data-order-type-level>
+                    <x-select label="Тип вида" name="type_level" required="true">
                         <option value="parent" selected>Родительский вид</option>
                         <option value="child">Дочерний вид</option>
                     </x-select>
-                    <div data-order-type-parent>
-                        <x-select label="Родитель" name="parent_id" placeholder="Выберите родителя"
-                            data-order-type-parent-select>
-                            @foreach ($parents as $parent)
-                                <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                            @endforeach
-                        </x-select>
-                    </div>
                     <x-select label="Единица измерения" name="unit" required="true">
                         @foreach ($units as $value => $label)
                             <option value="{{ $value }}" @selected($value === 'piece')>{{ $label }}</option>
@@ -162,18 +154,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const updateForm = (form) => {
-                if (!form) return;
-                const levelSelect = form.querySelector('[data-order-type-level]');
-                if (!levelSelect) return;
-                const parentWrap = form.querySelector('[data-order-type-parent]');
-                const parentSelect = form.querySelector('[data-order-type-parent-select]');
-
-                const isChild = levelSelect.value === 'child';
-                if (parentWrap) parentWrap.classList.toggle('hidden', !isChild);
-                if (parentSelect) parentSelect.required = isChild;
-            };
-
             const initFieldPicker = (root) => {
                 if (!root) return null;
                 if (root._fieldPickerApi) return root._fieldPickerApi;
@@ -362,16 +342,7 @@
                 return root._fieldPickerApi;
             };
 
-            const bindForm = (form) => {
-                if (!form) return;
-                const levelSelect = form.querySelector('[data-order-type-level]');
-                if (!levelSelect) return;
-                levelSelect.addEventListener('change', () => updateForm(form));
-                updateForm(form);
-            };
-
             document.querySelectorAll('[data-order-type-form]').forEach((form) => {
-                bindForm(form);
                 form.querySelectorAll('[data-field-picker]').forEach((picker) => {
                     initFieldPicker(picker);
                 });

@@ -109,19 +109,11 @@
                 @method('PUT')
                 <div class="mt-6 grid gap-4 max-h-[70vh] overflow-hidden overflow-y-scroll">
                     <x-input label="Название" name="name" required="true" data-modal-input="name" />
-                    <x-select label="Тип вида" name="type_level" required="true" data-modal-input="typeLevel"
-                        data-order-type-level>
+                    <x-select label="Тип вида" name="type_level" required="true" data-modal-input="typeLevel">
                         <option value="parent">Родительский вид</option>
                         <option value="child">Дочерний вид</option>
                     </x-select>
-                    <div data-order-type-parent>
-                        <x-select label="Родитель" name="parent_id" placeholder="Выберите родителя"
-                            data-modal-input="parentId" data-order-type-parent-select>
-                            @foreach ($parents as $parent)
-                                <option value="{{ $parent->id }}">{{ $parent->name }}</option>
-                            @endforeach
-                        </x-select>
-                    </div>
+                    <input type="hidden" name="parent_id" data-modal-input="parentId" />
                     <x-select label="Единица измерения" name="unit" required="true" data-modal-input="unit">
                         @foreach ($units as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
@@ -175,18 +167,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const updateForm = (form) => {
-                if (!form) return;
-                const levelSelect = form.querySelector('[data-order-type-level]');
-                if (!levelSelect) return;
-                const parentWrap = form.querySelector('[data-order-type-parent]');
-                const parentSelect = form.querySelector('[data-order-type-parent-select]');
-
-                const isChild = levelSelect.value === 'child';
-                if (parentWrap) parentWrap.classList.toggle('hidden', !isChild);
-                if (parentSelect) parentSelect.required = isChild;
-            };
-
             const initFieldPicker = (root) => {
                 if (!root) return null;
                 if (root._fieldPickerApi) return root._fieldPickerApi;
@@ -375,16 +355,7 @@
                 return root._fieldPickerApi;
             };
 
-            const bindForm = (form) => {
-                if (!form) return;
-                const levelSelect = form.querySelector('[data-order-type-level]');
-                if (!levelSelect) return;
-                levelSelect.addEventListener('change', () => updateForm(form));
-                updateForm(form);
-            };
-
             document.querySelectorAll('[data-order-type-form]').forEach((form) => {
-                bindForm(form);
                 form.querySelectorAll('[data-field-picker]').forEach((picker) => {
                     initFieldPicker(picker);
                 });
@@ -399,7 +370,6 @@
                     .filter(Boolean);
                 setTimeout(() => {
                     document.querySelectorAll('[data-order-type-form]').forEach((form) => {
-                        updateForm(form);
                         form.querySelectorAll('[data-field-picker]').forEach((picker) => {
                             const api = initFieldPicker(picker);
                             api?.setSelected(selected);

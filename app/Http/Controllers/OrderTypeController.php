@@ -41,7 +41,6 @@ class OrderTypeController extends Controller
             'name' => ['required', 'string', 'max:255', 'unique:order_types,name'],
             'type_level' => ['required', Rule::in(['parent', 'child'])],
             'parent_id' => [
-                Rule::requiredIf($request->input('type_level') === 'child'),
                 'nullable',
                 'integer',
                 'exists:order_types,id',
@@ -150,7 +149,6 @@ class OrderTypeController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('order_types', 'name')->ignore($orderType->id)],
             'type_level' => ['required', Rule::in(['parent', 'child'])],
             'parent_id' => [
-                Rule::requiredIf($request->input('type_level') === 'child'),
                 'nullable',
                 'integer',
                 'exists:order_types,id',

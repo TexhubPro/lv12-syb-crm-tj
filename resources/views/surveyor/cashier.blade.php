@@ -412,21 +412,13 @@
                             });
                         };
 
-                        const filterChildOptions = (select, parentId) => {
+                        const filterChildOptions = (select) => {
                             if (!select) return;
-                            const options = Array.from(select.options);
-                            options.forEach((option) => {
+                            Array.from(select.options).forEach((option) => {
                                 if (!option.value) return;
-                                const matches = String(option.dataset.parentId || '') === String(parentId || '');
-                                option.hidden = !matches;
-                                option.disabled = !matches;
+                                option.hidden = false;
+                                option.disabled = false;
                             });
-                            if (select.value) {
-                                const selected = select.selectedOptions[0];
-                                if (selected && selected.disabled) {
-                                    select.value = '';
-                                }
-                            }
                         };
 
                         const hydrateRow = (row, data) => {
