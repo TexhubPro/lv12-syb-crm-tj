@@ -218,7 +218,12 @@
                     <td>{{ $subOrder->amount }} с</td>
                 @endif
                 @if ($visibleFields->contains('discount'))
-                    <td>{{ $subOrder->discount }} с</td>
+                    @php
+                        $rowAmount = (float) ($subOrder->amount ?? 0);
+                        $rowDiscountPercent = (float) ($subOrder->discount ?? 0);
+                        $rowDiscountValue = $rowAmount * ($rowDiscountPercent / 100);
+                    @endphp
+                    <td>{{ number_format($rowDiscountValue, 2, '.', ' ') }} с</td>
                 @endif
                 @if ($visibleFields->contains('total'))
                     <td>{{ $subOrder->total }} с</td>
