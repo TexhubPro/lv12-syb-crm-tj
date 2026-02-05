@@ -107,7 +107,7 @@
                     return max(0, $amount - $total);
                 });
                 $groupTotal = $group->sum('total');
-                $groupDiscountPercent = $groupTotal > 0 ? ($groupDiscount / $groupTotal) * 100 : 0;
+                $groupDiscountPercent = $groupAmount > 0 ? ($groupDiscount / $groupAmount) * 100 : 0;
             @endphp
             <tr>
                 <td colspan="{{ $columnCount }}">Группа: {{ $groupTitle }}</td>
@@ -290,7 +290,7 @@
         <td colspan="{{ $summaryColumnCount }}">Общая скидка: {{ $subOrdersDiscount }} с</td>
     </tr>
     @php
-        $orderDiscountPercent = $order->grand_total > 0 ? ($subOrdersDiscount / $order->grand_total) * 100 : 0;
+        $orderDiscountPercent = $subOrdersAmount > 0 ? ($subOrdersDiscount / $subOrdersAmount) * 100 : 0;
     @endphp
     <tr>
         <td colspan="{{ $summaryColumnCount }}">Итого по заказу: {{ $order->grand_total }} с</td>

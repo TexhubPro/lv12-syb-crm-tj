@@ -979,7 +979,7 @@ if (!window.__texhubSubOrders) {
 
         const discountPercentEl = root.querySelector('[data-discount-percent]');
         if (discountPercentEl) {
-            const percent = grandTotal > 0 ? (discountTotal / grandTotal) * 100 : 0;
+            const percent = baseAmount > 0 ? (discountTotal / baseAmount) * 100 : 0;
             discountPercentEl.replaceChildren(document.createTextNode(percent.toFixed(2)));
         }
     };
