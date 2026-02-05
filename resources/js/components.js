@@ -976,6 +976,12 @@ if (!window.__texhubSubOrders) {
             const balanceValue = grandTotal - advance;
             summaryBalance.replaceChildren(document.createTextNode(balanceValue.toFixed(2)));
         }
+
+        const discountPercentEl = root.querySelector('[data-discount-percent]');
+        if (discountPercentEl) {
+            const percent = grandTotal > 0 ? (discountTotal / grandTotal) * 100 : 0;
+            discountPercentEl.replaceChildren(document.createTextNode(percent.toFixed(2)));
+        }
     };
 
     const initRow = (row) => {
