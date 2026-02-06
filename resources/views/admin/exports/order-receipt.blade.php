@@ -122,7 +122,7 @@
         }
 
         .summary {
-            width: 34%;
+            width: 100%;
             margin-left: auto;
             border-collapse: collapse;
             margin-top: 6px;
@@ -154,7 +154,7 @@
         }
 
         .group-summary {
-            width: 34%;
+            width: 100%;
             margin-left: auto;
             border-collapse: collapse;
             margin-top: 4px;
@@ -381,16 +381,10 @@
                 <tr>
                     <td class="label">Подытог</td>
                     <td class="right">{{ number_format($groupAmount, 2, '.', ' ') }} с</td>
-                </tr>
-                <tr>
                     <td class="label">Скидка</td>
                     <td class="right">{{ number_format($groupDiscount, 2, '.', ' ') }} с</td>
-                </tr>
-                <tr>
                     <td class="label">Итого</td>
                     <td class="right">{{ number_format($groupTotal, 2, '.', ' ') }} с</td>
-                </tr>
-                <tr>
                     <td class="label">Скидка, %</td>
                     <td class="right">{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
                 </tr>
@@ -398,32 +392,24 @@
         @endforeach
 
         <table class="summary">
-            <tr>
-                <td class="label">Подытог</td>
-                <td class="right">{{ number_format($subOrdersAmount, 2, '.', ' ') }} с</td>
-            </tr>
-            <tr>
-                <td class="label">Скидка</td>
-                <td class="right">{{ number_format($subOrdersDiscount, 2, '.', ' ') }} с</td>
-            </tr>
-            <tr>
-                <td class="label">Аванс</td>
-                <td class="right">{{ number_format($order->advance_amount, 2, '.', ' ') }} с</td>
-            </tr>
-            <tr>
-                <td class="label">Остаток</td>
-                <td class="right">{{ number_format($order->balance_amount, 2, '.', ' ') }} с</td>
-            </tr>
-            <tr class="total">
-                <td class="label">Итого</td>
-                <td class="right">{{ number_format($order->grand_total, 2, '.', ' ') }} с</td>
-            </tr>
             @php
                 $orderDiscountPercent = $subOrdersAmount > 0 ? ($subOrdersDiscount / $subOrdersAmount) * 100 : 0;
             @endphp
             <tr>
+                <td class="label">Подытог</td>
+                <td class="right">{{ number_format($subOrdersAmount, 2, '.', ' ') }} с</td>
+                <td class="label">Скидка</td>
+                <td class="right">{{ number_format($subOrdersDiscount, 2, '.', ' ') }} с</td>
+                <td class="label">Итого</td>
+                <td class="right">{{ number_format($order->grand_total, 2, '.', ' ') }} с</td>
                 <td class="label">Скидка, %</td>
                 <td class="right">{{ number_format($orderDiscountPercent, 2, '.', ' ') }}%</td>
+            </tr>
+            <tr>
+                <td class="label">Аванс</td>
+                <td class="right">{{ number_format($order->advance_amount, 2, '.', ' ') }} с</td>
+                <td class="label">Остаток</td>
+                <td class="right">{{ number_format($order->balance_amount, 2, '.', ' ') }} с</td>
             </tr>
         </table>
     </div>

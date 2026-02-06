@@ -252,19 +252,13 @@
             </tr>
         @endforeach
         <tr>
-            <td colspan="{{ $columnCount - 1 }}">Подытог</td>
+            <td colspan="{{ max(1, $columnCount - 8) }}">Подытог</td>
             <td>{{ $groupAmount }} с</td>
-        </tr>
-        <tr>
-            <td colspan="{{ $columnCount - 1 }}">Скидка</td>
+            <td>Скидка</td>
             <td>{{ $groupDiscount }} с</td>
-        </tr>
-        <tr>
-            <td colspan="{{ $columnCount - 1 }}">Итого</td>
+            <td>Итого</td>
             <td>{{ $groupTotal }} с</td>
-        </tr>
-        <tr>
-            <td colspan="{{ $columnCount - 1 }}">Скидка, %</td>
+            <td>Скидка, %</td>
             <td>{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
         </tr>
         <tr>
@@ -289,24 +283,22 @@
         <td colspan="{{ $summaryColumnCount }}"></td>
     </tr>
     <tr>
-        <td colspan="{{ $summaryColumnCount }}">Подытог: {{ $subOrdersAmount }} с</td>
-    </tr>
-    <tr>
-        <td colspan="{{ $summaryColumnCount }}">Общая скидка: {{ $subOrdersDiscount }} с</td>
+        <td colspan="{{ max(1, $summaryColumnCount - 8) }}">Подытог</td>
+        <td>{{ $subOrdersAmount }} с</td>
+        <td>Скидка</td>
+        <td>{{ $subOrdersDiscount }} с</td>
+        <td>Итого</td>
+        <td>{{ $order->grand_total }} с</td>
+        <td>Скидка, %</td>
+        <td>{{ number_format($orderDiscountPercent, 2, '.', ' ') }}%</td>
     </tr>
     @php
         $orderDiscountPercent = $subOrdersAmount > 0 ? ($subOrdersDiscount / $subOrdersAmount) * 100 : 0;
     @endphp
     <tr>
-        <td colspan="{{ $summaryColumnCount }}">Итого по заказу: {{ $order->grand_total }} с</td>
-    </tr>
-    <tr>
-        <td colspan="{{ $summaryColumnCount }}">Скидка, %: {{ number_format($orderDiscountPercent, 2, '.', ' ') }}%</td>
-    </tr>
-    <tr>
-        <td colspan="{{ $summaryColumnCount }}">Аванс: {{ $order->advance_amount }} с</td>
-    </tr>
-    <tr>
-        <td colspan="{{ $summaryColumnCount }}">Остаток: {{ $order->balance_amount }} с</td>
+        <td colspan="{{ max(1, $summaryColumnCount - 4) }}">Аванс</td>
+        <td>{{ $order->advance_amount }} с</td>
+        <td>Остаток</td>
+        <td>{{ $order->balance_amount }} с</td>
     </tr>
 </table>
