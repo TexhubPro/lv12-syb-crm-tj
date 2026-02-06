@@ -74,6 +74,7 @@ class SurveyorCashierController extends Controller
             'sub_orders' => ['nullable', 'array'],
             'sub_orders.*.order_kind' => ['required', 'string', 'max:255'],
             'sub_orders.*.order_type_id' => ['nullable', 'exists:order_types,id'],
+            'sub_orders.*.parent_order_type_id' => ['nullable', 'exists:order_types,id'],
             'sub_orders.*.profile_color_id' => ['nullable', 'exists:profile_colors,id'],
             'sub_orders.*.cornice_type_id' => ['nullable', 'exists:cornice_types,id'],
             'sub_orders.*.division' => ['nullable', 'string', 'max:255'],
@@ -133,9 +134,16 @@ class SurveyorCashierController extends Controller
                 return;
             }
 
+            $orderTypeId = $subOrder['order_type_id'] ?? null;
+            $parentOrderTypeId = $subOrder['parent_order_type_id'] ?? null;
+            if (($subOrder['order_kind'] ?? null) === 'Родитель') {
+                $parentOrderTypeId = $orderTypeId;
+            }
+
             SubOrder::create([
                 'order_id' => $order->id,
-                'order_type_id' => $subOrder['order_type_id'] ?? null,
+                'order_type_id' => $orderTypeId,
+                'parent_order_type_id' => $parentOrderTypeId,
                 'profile_color_id' => $subOrder['profile_color_id'] ?? null,
                 'cornice_type_id' => $subOrder['cornice_type_id'] ?? null,
                 'order_kind' => $subOrder['order_kind'] ?? null,

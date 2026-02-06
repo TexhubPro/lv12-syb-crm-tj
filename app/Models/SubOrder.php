@@ -12,6 +12,7 @@ class SubOrder extends Model
     protected $fillable = [
         'order_id',
         'order_type_id',
+        'parent_order_type_id',
         'profile_color_id',
         'cornice_type_id',
         'order_kind',

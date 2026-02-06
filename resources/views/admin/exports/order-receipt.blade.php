@@ -214,7 +214,10 @@
     <div class="section">
         @php
             $groupedSubOrders = $subOrders->groupBy(function ($subOrder) {
-                return $subOrder->orderType?->parent?->id ?? $subOrder->orderType?->id ?? 0;
+                return $subOrder->parent_order_type_id
+                    ?? $subOrder->orderType?->parent?->id
+                    ?? $subOrder->orderType?->id
+                    ?? 0;
             });
         @endphp
         @foreach ($groupedSubOrders as $group)
@@ -225,7 +228,10 @@
                     })
                     ->unique()
                     ->values();
-                $groupTitle = $group->first()?->orderType?->parent?->name ?? $group->first()?->orderType?->name ?? '—';
+                $groupTitle = ($group->firstWhere('order_kind', 'Родитель')?->orderType?->name)
+                    ?? $group->first()?->orderType?->parent?->name
+                    ?? $group->first()?->orderType?->name
+                    ?? '—';
                 $groupAmount = $group->sum('amount');
                 $groupDiscount = $group->sum(function ($subOrder) {
                     $amount = (float) ($subOrder->amount ?? 0);

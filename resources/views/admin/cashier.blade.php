@@ -233,6 +233,7 @@
                         </div>
                         <div class="mt-2 grid gap-3 lg:grid-cols-8">
                             <input type="hidden" name="sub_orders[__index__][order_kind]" value="Дочерний" />
+                            <input type="hidden" name="sub_orders[__index__][parent_order_type_id]" data-parent-link />
                             <div data-field-key="order_type">
                                 <x-select label="Вид" name="sub_orders[__index__][order_type_id]" required="true"
                                     data-sub-type data-searchable-select>
@@ -430,6 +431,7 @@
                                 el.value = value ?? '';
                             };
                             setField('order_kind', data.order_kind);
+                            setField('parent_order_type_id', data.parent_order_type_id);
                             setField('order_type_id', data.order_type_id);
                             setField('cornice_type_id', data.cornice_type_id);
                             setField('fabric_code_id', data.fabric_code_id);
@@ -463,8 +465,10 @@
                             const list = parentBlock.querySelector('[data-child-list]');
                             if (!list) return;
                             list.appendChild(row);
+                            const parentLink = row.querySelector('[data-parent-link]');
+                            if (parentLink) parentLink.value = parentId ?? '';
                             const typeSelect = row.querySelector('[data-sub-type]');
-                            filterChildOptions(typeSelect, parentId);
+                            filterChildOptions(typeSelect);
                             if (data) {
                                 hydrateRow(row, data);
                                 if (typeSelect) {
@@ -497,7 +501,9 @@
                             }
                             block.querySelectorAll('[data-suborder-row]').forEach((row) => {
                                 const typeSelect = row.querySelector('[data-sub-type]');
-                                filterChildOptions(typeSelect, value);
+                                const parentLink = row.querySelector('[data-parent-link]');
+                                if (parentLink) parentLink.value = value ?? '';
+                                filterChildOptions(typeSelect);
                                 updateRowFields(row, typeSelect?.value);
                                 triggerRowRecalc(row);
                             });

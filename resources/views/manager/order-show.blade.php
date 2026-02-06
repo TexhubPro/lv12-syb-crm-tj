@@ -196,7 +196,10 @@
 
             @php
                 $groupedSubOrders = $subOrders->groupBy(function ($subOrder) {
-                    return $subOrder->orderType?->parent?->id ?? $subOrder->orderType?->id ?? 0;
+                    return $subOrder->parent_order_type_id
+                        ?? $subOrder->orderType?->parent?->id
+                        ?? $subOrder->orderType?->id
+                        ?? 0;
                 });
             @endphp
             @if ($subOrders->isEmpty())
@@ -241,7 +244,10 @@
                         $nonSummaryCount = 2 + $visibleColumns
                             ->reject(fn($key) => in_array($key, $summaryKeys, true))
                             ->count();
-                        $groupTitle = $group->first()?->orderType?->parent?->name ?? $group->first()?->orderType?->name ?? '—';
+                        $groupTitle = ($group->firstWhere('order_kind', 'Родитель')?->orderType?->name)
+                            ?? $group->first()?->orderType?->parent?->name
+                            ?? $group->first()?->orderType?->name
+                            ?? '—';
                         $groupArea = $group->sum('area');
                         $groupAmount = $group->sum('amount');
                         $groupDiscount = $group->sum(function ($subOrder) {
