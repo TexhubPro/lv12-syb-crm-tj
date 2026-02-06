@@ -259,18 +259,12 @@
                         $groupTotal = $group->sum('total');
                     @endphp
                     <div class="flex flex-col">
-                        <div class="mb-3 text-xs uppercase tracking-[0.3em] text-slate-500">
-                            {{ $groupTitle }}
-                        </div>
                         <div class="overflow-x-auto">
                             <div class="inline-block max-w-[calc(100vw-30px)] lg:max-w-[calc(100vw-300px)]">
                                 <div class="overflow-hidden overflow-x-auto">
                                     <table class="min-w-full divide-y divide-slate-200/70 dark:divide-white/10">
                                         <thead>
                                             <tr class="text-slate-500">
-                                                <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                    Группа
-                                                </th>
                                                 <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
                                                     Вид
                                                 </th>
@@ -405,10 +399,6 @@
                                         <tbody class="divide-y divide-slate-200/70 dark:divide-white/10">
                                             @foreach ($group as $subOrder)
                                                 <tr class="text-sm text-slate-700 dark:text-slate-200">
-                                                    <td
-                                                        class="px-6 py-5 font-semibold whitespace-nowrap text-slate-900 dark:text-white">
-                                                        {{ $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '—' }}
-                                                    </td>
                                                     <td class="px-6 py-5 whitespace-nowrap">
                                                         {{ $subOrder->orderType?->name ?? '—' }}
                                                     </td>

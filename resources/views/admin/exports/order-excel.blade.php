@@ -117,9 +117,6 @@
                 $groupDiscountPercent = $groupAmount > 0 ? ($groupDiscount / $groupAmount) * 100 : 0;
             @endphp
             <tr>
-                <td colspan="{{ $columnCount }}">Группа: {{ $groupTitle }}</td>
-            </tr>
-            <tr>
                 <th>Вид</th>
                 @if ($visibleFields->contains('cornice_type'))
                     <th>Тип карниза</th>

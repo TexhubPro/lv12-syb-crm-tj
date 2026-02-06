@@ -43,13 +43,7 @@ class SurveyorOrderController extends Controller
             'subOrders.controlType',
         ]);
 
-        $subOrders = $order->subOrders
-            ->sortBy(fn($subOrder) => [
-                $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '',
-                $subOrder->orderType?->name ?? '',
-                $subOrder->id ?? 0,
-            ])
-            ->values();
+        $subOrders = $order->subOrders->values();
         $subOrdersAmount = $subOrders->sum('amount');
         $subOrdersTotal = $subOrders->sum('total');
         $subOrdersArea = $subOrders->sum('area');
@@ -88,13 +82,7 @@ class SurveyorOrderController extends Controller
             'subOrders.fabricCode',
             'subOrders.controlType',
         ]);
-        $subOrders = $order->subOrders
-            ->sortBy(fn($subOrder) => [
-                $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '',
-                $subOrder->orderType?->name ?? '',
-                $subOrder->id ?? 0,
-            ])
-            ->values();
+        $subOrders = $order->subOrders->values();
         $subOrdersAmount = $subOrders->sum('amount');
         $subOrdersTotal = $subOrders->sum('total');
         $subOrdersArea = $subOrders->sum('area');

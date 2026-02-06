@@ -144,15 +144,6 @@
             font-weight: 700;
         }
 
-        .group-title {
-            margin-top: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #111827;
-        }
-
         .group-summary {
             width: 100%;
             margin-left: auto;
@@ -242,7 +233,6 @@
                 $groupTotal = $group->sum('total');
                 $groupDiscountPercent = $groupAmount > 0 ? ($groupDiscount / $groupAmount) * 100 : 0;
             @endphp
-            <div class="group-title">Группа: {{ $groupTitle }}</div>
             <table class="table table-block">
                 <thead>
                     <tr>
