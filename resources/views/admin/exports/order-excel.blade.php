@@ -251,7 +251,7 @@
                 @endif
             </tr>
         @endforeach
-        <tr style="background:#f3f4f6;">
+        <tr style="background:#fee2e2;">
             <td colspan="{{ max(1, $columnCount - 8) }}">Подытог</td>
             <td>{{ $groupAmount }} с</td>
             <td>Скидка</td>
@@ -285,7 +285,7 @@
     @php
         $orderDiscountPercent = $subOrdersAmount > 0 ? ($subOrdersDiscount / $subOrdersAmount) * 100 : 0;
     @endphp
-    <tr style="background:#f3f4f6;">
+    <tr style="background:#fee2e2;">
         <td colspan="{{ max(1, $summaryColumnCount - 8) }}">Подытог</td>
         <td>{{ $subOrdersAmount }} с</td>
         <td>Скидка</td>
@@ -295,7 +295,7 @@
         <td>Скидка, %</td>
         <td>{{ number_format($orderDiscountPercent, 2, '.', ' ') }}%</td>
     </tr>
-    <tr style="background:#e2e8f0;">
+    <tr style="background:#0f172a;color:#ffffff;">
         <td colspan="{{ max(1, $summaryColumnCount - 4) }}">Аванс</td>
         <td>{{ $order->advance_amount }} с</td>
         <td>Остаток</td>

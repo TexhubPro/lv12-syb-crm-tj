@@ -171,11 +171,12 @@
         }
 
         .summary-row {
-            background: #f3f4f6;
+            background: #fee2e2;
         }
 
         .summary-row-alt {
-            background: #e2e8f0;
+            background: #0f172a;
+            color: #ffffff;
         }
 
         .signature {
