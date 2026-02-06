@@ -69,6 +69,7 @@
                 ?? $subOrder->orderType?->id
                 ?? 0;
         });
+        $groupCount = $groupedSubOrders->count();
     @endphp
         @foreach ($groupedSubOrders as $group)
             @php
@@ -257,16 +258,18 @@
                 @endif
             </tr>
         @endforeach
-        <tr style="background:#0f172a;color:#ffffff;">
-            <td colspan="{{ max(1, $columnCount - 8) }}">Подытог</td>
-            <td>{{ $groupAmount }} с</td>
-            <td>Скидка</td>
-            <td>{{ $groupDiscount }} с</td>
-            <td>Итого</td>
-            <td>{{ $groupTotal }} с</td>
-            <td>Скидка, %</td>
-            <td>{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
-        </tr>
+        @if ($groupCount > 1)
+            <tr style="background:#0f172a;color:#ffffff;">
+                <td colspan="{{ max(1, $columnCount - 8) }}">Подытог</td>
+                <td>{{ $groupAmount }} с</td>
+                <td>Скидка</td>
+                <td>{{ $groupDiscount }} с</td>
+                <td>Итого</td>
+                <td>{{ $groupTotal }} с</td>
+                <td>Скидка, %</td>
+                <td>{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
+            </tr>
+        @endif
         <tr>
             <td colspan="{{ $columnCount }}"></td>
         </tr>

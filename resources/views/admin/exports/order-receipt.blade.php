@@ -219,6 +219,7 @@
                     ?? $subOrder->orderType?->id
                     ?? 0;
             });
+            $groupCount = $groupedSubOrders->count();
         @endphp
         @foreach ($groupedSubOrders as $group)
             @php
@@ -389,18 +390,20 @@
                     @endforeach
                 </tbody>
             </table>
-            <table class="group-summary">
-                <tr class="summary-row">
-                    <td class="label">Подытог</td>
-                    <td class="right">{{ number_format($groupAmount, 2, '.', ' ') }} с</td>
-                    <td class="label">Скидка</td>
-                    <td class="right">{{ number_format($groupDiscount, 2, '.', ' ') }} с</td>
-                    <td class="label">Итого</td>
-                    <td class="right">{{ number_format($groupTotal, 2, '.', ' ') }} с</td>
-                    <td class="label">Скидка, %</td>
-                    <td class="right">{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
-                </tr>
-            </table>
+            @if ($groupCount > 1)
+                <table class="group-summary">
+                    <tr class="summary-row">
+                        <td class="label">Подытог</td>
+                        <td class="right">{{ number_format($groupAmount, 2, '.', ' ') }} с</td>
+                        <td class="label">Скидка</td>
+                        <td class="right">{{ number_format($groupDiscount, 2, '.', ' ') }} с</td>
+                        <td class="label">Итого</td>
+                        <td class="right">{{ number_format($groupTotal, 2, '.', ' ') }} с</td>
+                        <td class="label">Скидка, %</td>
+                        <td class="right">{{ number_format($groupDiscountPercent, 2, '.', ' ') }}%</td>
+                    </tr>
+                </table>
+            @endif
         @endforeach
 
         <table class="summary">

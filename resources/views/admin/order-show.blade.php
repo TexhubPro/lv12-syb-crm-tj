@@ -201,6 +201,7 @@
                         ?? $subOrder->orderType?->id
                         ?? 0;
                 });
+                $groupCount = $groupedSubOrders->count();
             @endphp
             @if ($subOrders->isEmpty())
                 <div class="px-6 py-10 text-center text-sm text-slate-500">
@@ -520,7 +521,7 @@
                                                 </tr>
                                             @endforeach
                                         </tbody>
-                                        @if ($group->isNotEmpty() && $columnCount > 2)
+                                        @if ($groupCount > 1 && $group->isNotEmpty() && $columnCount > 2)
                                             <tfoot>
                                                 <tr class="text-sm text-slate-900 dark:text-white">
                                                     <td colspan="{{ $nonSummaryCount }}"
