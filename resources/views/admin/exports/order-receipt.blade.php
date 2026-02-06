@@ -170,6 +170,14 @@
             font-size: 9px;
         }
 
+        .summary-row {
+            background: #f3f4f6;
+        }
+
+        .summary-row-alt {
+            background: #e2e8f0;
+        }
+
         .signature {
             margin-top: 8px;
             display: flex;
@@ -378,7 +386,7 @@
                 </tbody>
             </table>
             <table class="group-summary">
-                <tr>
+                <tr class="summary-row">
                     <td class="label">Подытог</td>
                     <td class="right">{{ number_format($groupAmount, 2, '.', ' ') }} с</td>
                     <td class="label">Скидка</td>
@@ -395,7 +403,7 @@
             @php
                 $orderDiscountPercent = $subOrdersAmount > 0 ? ($subOrdersDiscount / $subOrdersAmount) * 100 : 0;
             @endphp
-            <tr>
+            <tr class="summary-row">
                 <td class="label">Подытог</td>
                 <td class="right">{{ number_format($subOrdersAmount, 2, '.', ' ') }} с</td>
                 <td class="label">Скидка</td>
@@ -405,7 +413,7 @@
                 <td class="label">Скидка, %</td>
                 <td class="right">{{ number_format($orderDiscountPercent, 2, '.', ' ') }}%</td>
             </tr>
-            <tr>
+            <tr class="summary-row-alt">
                 <td class="label">Аванс</td>
                 <td class="right">{{ number_format($order->advance_amount, 2, '.', ' ') }} с</td>
                 <td class="label">Остаток</td>
