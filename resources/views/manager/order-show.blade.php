@@ -195,343 +195,361 @@
             </div>
 
             @php
-                $visibleFields = $subOrders
-                    ->flatMap(function ($subOrder) {
-                        return $subOrder->orderType?->fields?->pluck('key') ?? collect();
-                    })
-                    ->unique()
-                    ->values();
-                $visibleColumns = collect([
-                    'cornice_type',
-                    'fabric_code',
-                    'profile_color',
-                    'control_type',
-                    'room',
-                    'division',
-                    'width',
-                    'height',
-                    'quantity',
-                    'area',
-                    'price',
-                    'amount',
-                    'discount',
-                    'total',
-                    'note',
-                    'corsage',
-                    'tape',
-                    'sewing',
-                    'installation',
-                    'motor',
-                    'tiebacks',
-                ])->filter(fn($key) => $visibleFields->contains($key));
-                $columnCount = 2 + $visibleColumns->count();
-                $summaryKeys = ['area', 'amount', 'discount', 'total'];
-                $summaryVisible = $visibleColumns->filter(fn($key) => in_array($key, $summaryKeys, true));
-                $nonSummaryCount = 2 + $visibleColumns
-                    ->reject(fn($key) => in_array($key, $summaryKeys, true))
-                    ->count();
+                $groupedSubOrders = $subOrders->groupBy(function ($subOrder) {
+                    return $subOrder->orderType?->parent?->id ?? $subOrder->orderType?->id ?? 0;
+                });
             @endphp
-            <div class="flex flex-col">
-                <div class="overflow-x-auto ">
-                    <div class="inline-block max-w-[calc(100vw-30px)] lg:max-w-[calc(100vw-300px)]">
-                        <div class="overflow-hidden overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200/70 dark:divide-white/10">
-                                <thead>
-                                    <tr class="text-slate-500">
-                                        <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                            Группа
-                                        </th>
-                                        <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                            Вид
-                                        </th>
-                                        @if ($visibleFields->contains('cornice_type'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Тип карниза
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('fabric_code'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Код ткани
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('profile_color'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Цвет профиля
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('control_type'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Тип управления
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('room'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Комната
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('division'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Разделения
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('width'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Ширина
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('height'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Высота
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('quantity'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Кол-во
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('area'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Площадь
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('price'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Цена
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('amount'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Сумма
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('discount'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Скидка
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('total'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
-                                                Итого
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('note'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Примечания
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('corsage'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Карсаж
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('tape'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Лента
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('sewing'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Пошив
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('installation'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Монтаж
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('motor'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Мотор
-                                            </th>
-                                        @endif
-                                        @if ($visibleFields->contains('tiebacks'))
-                                            <th
-                                                class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
-                                                Прихваты
-                                            </th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-200/70 dark:divide-white/10">
-                                    @forelse ($subOrders as $subOrder)
-                                        <tr class="text-sm text-slate-700 dark:text-slate-200">
-                                            <td
-                                                class="px-6 py-5 font-semibold whitespace-nowrap text-slate-900 dark:text-white">
-                                                {{ $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '—' }}
-                                            </td>
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->orderType?->name ?? '—' }}
-                                            </td>
-                                            @if ($visibleFields->contains('cornice_type'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->corniceType?->name ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('fabric_code'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->fabricCode?->name ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('profile_color'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->profileColor?->name ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('control_type'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->controlType?->name ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('room'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->room ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('division'))
-                                                <td class="px-6 py-5 whitespace-nowrap">
-                                                    {{ $subOrder->division ?? '—' }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('width'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->width, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('height'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->height, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('quantity'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ $subOrder->quantity }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('area'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->area, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('price'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->price, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('amount'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->amount, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                            @if ($visibleFields->contains('discount'))
-                                                <td class="px-6 py-5 text-right whitespace-nowrap">
-                                                    {{ number_format($subOrder->discount, 2, '.', ' ') }}
-                                                </td>
-                                            @endif
-                                        @if ($visibleFields->contains('total'))
-                                            <td
-                                                class="px-6 py-5 text-right font-semibold whitespace-nowrap text-slate-900 dark:text-white">
-                                                {{ number_format($subOrder->total, 2, '.', ' ') }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('note'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->note ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('corsage'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->corsage ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('tape'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->tape ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('sewing'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->sewing ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('installation'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->installation ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('motor'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->motor ?? '—' }}
-                                            </td>
-                                        @endif
-                                        @if ($visibleFields->contains('tiebacks'))
-                                            <td class="px-6 py-5 whitespace-nowrap">
-                                                {{ $subOrder->tiebacks ?? '—' }}
-                                            </td>
-                                        @endif
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="{{ $columnCount }}"
-                                                class="px-6 py-10 text-center text-sm text-slate-500">
-                                                В этом заказе пока нет подзаказов.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                                @if ($subOrders->isNotEmpty() && $columnCount > 2)
-                                    <tfoot>
-                                        <tr class="text-sm text-slate-900 dark:text-white">
-                                            <td colspan="{{ $nonSummaryCount }}"
-                                                class="px-6 py-5 text-right font-semibold">
-                                                Итоги по позициям
-                                            </td>
-                                            @foreach ($summaryVisible as $summaryKey)
-                                                @if ($summaryKey === 'area')
-                                                    <td class="px-6 py-5 text-right font-semibold">
-                                                        {{ number_format($subOrdersArea, 2, '.', ' ') }}
-                                                    </td>
-                                                @elseif ($summaryKey === 'amount')
-                                                    <td class="px-6 py-5 text-right font-semibold">
-                                                        {{ number_format($subOrdersAmount, 2, '.', ' ') }}
-                                                    </td>
-                                                @elseif ($summaryKey === 'discount')
-                                                    <td class="px-6 py-5 text-right font-semibold">
-                                                        {{ number_format($subOrdersDiscount, 2, '.', ' ') }}
-                                                    </td>
-                                                @elseif ($summaryKey === 'total')
-                                                    <td class="px-6 py-5 text-right font-semibold">
-                                                        {{ number_format($subOrdersTotal, 2, '.', ' ') }}
-                                                    </td>
+            @if ($subOrders->isEmpty())
+                <div class="px-6 py-10 text-center text-sm text-slate-500">
+                    В этом заказе пока нет подзаказов.
+                </div>
+            @else
+                @foreach ($groupedSubOrders as $group)
+                    @php
+                        $visibleFields = $group
+                            ->flatMap(function ($subOrder) {
+                                return $subOrder->orderType?->fields?->pluck('key') ?? collect();
+                            })
+                            ->unique()
+                            ->values();
+                        $visibleColumns = collect([
+                            'cornice_type',
+                            'fabric_code',
+                            'profile_color',
+                            'control_type',
+                            'room',
+                            'division',
+                            'width',
+                            'height',
+                            'quantity',
+                            'area',
+                            'price',
+                            'amount',
+                            'discount',
+                            'total',
+                            'note',
+                            'corsage',
+                            'tape',
+                            'sewing',
+                            'installation',
+                            'motor',
+                            'tiebacks',
+                        ])->filter(fn($key) => $visibleFields->contains($key));
+                        $columnCount = 2 + $visibleColumns->count();
+                        $summaryKeys = ['area', 'amount', 'discount', 'total'];
+                        $summaryVisible = $visibleColumns->filter(fn($key) => in_array($key, $summaryKeys, true));
+                        $nonSummaryCount = 2 + $visibleColumns
+                            ->reject(fn($key) => in_array($key, $summaryKeys, true))
+                            ->count();
+                        $groupTitle = $group->first()?->orderType?->parent?->name ?? $group->first()?->orderType?->name ?? '—';
+                        $groupArea = $group->sum('area');
+                        $groupAmount = $group->sum('amount');
+                        $groupDiscount = $group->sum(function ($subOrder) {
+                            $amount = (float) ($subOrder->amount ?? 0);
+                            $total = (float) ($subOrder->total ?? 0);
+                            return max(0, $amount - $total);
+                        });
+                        $groupTotal = $group->sum('total');
+                    @endphp
+                    <div class="flex flex-col">
+                        <div class="mb-3 text-xs uppercase tracking-[0.3em] text-slate-500">
+                            {{ $groupTitle }}
+                        </div>
+                        <div class="overflow-x-auto">
+                            <div class="inline-block max-w-[calc(100vw-30px)] lg:max-w-[calc(100vw-300px)]">
+                                <div class="overflow-hidden overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-slate-200/70 dark:divide-white/10">
+                                        <thead>
+                                            <tr class="text-slate-500">
+                                                <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                    Группа
+                                                </th>
+                                                <th class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                    Вид
+                                                </th>
+                                                @if ($visibleFields->contains('cornice_type'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Тип карниза
+                                                    </th>
                                                 @endif
+                                                @if ($visibleFields->contains('fabric_code'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Код ткани
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('profile_color'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Цвет профиля
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('control_type'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Тип управления
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('room'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Комната
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('division'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Разделения
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('width'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Ширина
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('height'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Высота
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('quantity'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Кол-во
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('area'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Площадь
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('price'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Цена
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('amount'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Сумма
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('discount'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Скидка
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('total'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-right uppercase tracking-[0.3em]">
+                                                        Итого
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('note'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Примечания
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('corsage'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Карсаж
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('tape'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Лента
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('sewing'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Пошив
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('installation'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Монтаж
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('motor'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Мотор
+                                                    </th>
+                                                @endif
+                                                @if ($visibleFields->contains('tiebacks'))
+                                                    <th
+                                                        class="px-6 py-4 text-xs font-semibold text-left uppercase tracking-[0.3em]">
+                                                        Прихваты
+                                                    </th>
+                                                @endif
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-200/70 dark:divide-white/10">
+                                            @foreach ($group as $subOrder)
+                                                <tr class="text-sm text-slate-700 dark:text-slate-200">
+                                                    <td
+                                                        class="px-6 py-5 font-semibold whitespace-nowrap text-slate-900 dark:text-white">
+                                                        {{ $subOrder->orderType?->parent?->name ?? $subOrder->orderType?->name ?? '—' }}
+                                                    </td>
+                                                    <td class="px-6 py-5 whitespace-nowrap">
+                                                        {{ $subOrder->orderType?->name ?? '—' }}
+                                                    </td>
+                                                    @if ($visibleFields->contains('cornice_type'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->corniceType?->name ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('fabric_code'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->fabricCode?->name ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('profile_color'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->profileColor?->name ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('control_type'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->controlType?->name ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('room'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->room ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('division'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->division ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('width'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->width, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('height'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->height, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('quantity'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ $subOrder->quantity }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('area'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->area, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('price'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->price, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('amount'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->amount, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('discount'))
+                                                        <td class="px-6 py-5 text-right whitespace-nowrap">
+                                                            {{ number_format($subOrder->discount, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('total'))
+                                                        <td
+                                                            class="px-6 py-5 text-right font-semibold whitespace-nowrap text-slate-900 dark:text-white">
+                                                            {{ number_format($subOrder->total, 2, '.', ' ') }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('note'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->note ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('corsage'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->corsage ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('tape'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->tape ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('sewing'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->sewing ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('installation'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->installation ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('motor'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->motor ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                    @if ($visibleFields->contains('tiebacks'))
+                                                        <td class="px-6 py-5 whitespace-nowrap">
+                                                            {{ $subOrder->tiebacks ?? '—' }}
+                                                        </td>
+                                                    @endif
+                                                </tr>
                                             @endforeach
-                                        </tr>
-                                    </tfoot>
-                                @endif
-                            </table>
+                                        </tbody>
+                                        @if ($group->isNotEmpty() && $columnCount > 2)
+                                            <tfoot>
+                                                <tr class="text-sm text-slate-900 dark:text-white">
+                                                    <td colspan="{{ $nonSummaryCount }}"
+                                                        class="px-6 py-5 text-right font-semibold">
+                                                        Итоги по позициям
+                                                    </td>
+                                                    @foreach ($summaryVisible as $summaryKey)
+                                                        @if ($summaryKey === 'area')
+                                                            <td class="px-6 py-5 text-right font-semibold">
+                                                                {{ number_format($groupArea, 2, '.', ' ') }}
+                                                            </td>
+                                                        @elseif ($summaryKey === 'amount')
+                                                            <td class="px-6 py-5 text-right font-semibold">
+                                                                {{ number_format($groupAmount, 2, '.', ' ') }}
+                                                            </td>
+                                                        @elseif ($summaryKey === 'discount')
+                                                            <td class="px-6 py-5 text-right font-semibold">
+                                                                {{ number_format($groupDiscount, 2, '.', ' ') }}
+                                                            </td>
+                                                        @elseif ($summaryKey === 'total')
+                                                            <td class="px-6 py-5 text-right font-semibold">
+                                                                {{ number_format($groupTotal, 2, '.', ' ') }}
+                                                            </td>
+                                                        @endif
+                                                    @endforeach
+                                                </tr>
+                                            </tfoot>
+                                        @endif
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                @endforeach
+            @endif
         </div>
     </div>
 @endsection

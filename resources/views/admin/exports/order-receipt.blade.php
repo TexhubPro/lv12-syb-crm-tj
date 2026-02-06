@@ -170,10 +170,7 @@
             font-size: 9px;
         }
 
-        .summary-row {
-            background: #fee2e2;
-        }
-
+        .summary-row,
         .summary-row-alt {
             background: #0f172a;
             color: #ffffff;
